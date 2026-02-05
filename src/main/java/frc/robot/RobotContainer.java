@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandClimber;
+import frc.robot.subsystems.CommandIntake;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
@@ -42,8 +43,10 @@ public class RobotContainer {
         private final CommandXboxController joystick = new CommandXboxController(1);
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+        
         // SubSystems
         private final CommandClimber climberSystem = new CommandClimber();
+        private final CommandIntake intakeSystem = new CommandIntake();
 
         public RobotContainer() {
                 configureBindings();
@@ -91,8 +94,8 @@ public class RobotContainer {
                 joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
                 // Climber Buttons
-                // Go Up (Up DPAD)
-                joystick.povUp()
+                // Go Up (X BTN)
+                joystick.x()
                         .onTrue(new InstantCommand(() -> 
                                 climberSystem.setSpeed(Constants.Climber.MOTOR_SPEED),
                                 climberSystem
@@ -102,8 +105,8 @@ public class RobotContainer {
                                 climberSystem
                         ));
 
-                // Go Down (Down DPAD)
-                joystick.povDown()
+                // Go Down (Y BTN)
+                joystick.y()
                         .onTrue(new InstantCommand(() -> 
                                 climberSystem.setSpeed(-Constants.Climber.MOTOR_SPEED),
                                 climberSystem
@@ -113,6 +116,20 @@ public class RobotContainer {
                                 climberSystem
                         ));
 
+                // Shooter Buttons
+                // Forward (Right Trigger)
+                joystick.rightTrigger()
+                        .onTrue(new InstantCommand(() -> intakeSystem.setSpeed(Constants.Intake.MOTOR_SPEED),
+                                                intakeSystem))
+                        .onFalse(new InstantCommand(() -> intakeSystem.setSpeed(0),
+                                                intakeSystem));
+
+                // Backward (Left Trigger)
+                joystick.leftTrigger()
+                        .onTrue(new InstantCommand(() -> intakeSystem.setSpeed(-Constants.Intake.MOTOR_SPEED),
+                                                intakeSystem))
+                        .onFalse(new InstantCommand(() -> intakeSystem.setSpeed(0),
+                                                intakeSystem));
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 

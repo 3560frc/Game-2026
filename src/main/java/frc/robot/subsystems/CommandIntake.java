@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
 
-public class CommandShooter extends SubsystemBase {
+public class CommandIntake extends SubsystemBase {
   TalonFX m_motor = new TalonFX(Constants.Intake.Moter_ID);
 
   public void setSpeed(double speed) {
