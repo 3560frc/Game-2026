@@ -8,9 +8,10 @@ import frc.robot.Constants;
 
 public class CommandClimber extends SubsystemBase {
     private final TalonFX climberMoter = new TalonFX(Constants.Climber.Moter_ID);
-    private final PIDController pidController = new PIDController(Constants.Climber.kP, Constants.Climber.kI, Constants.Climber.kD);
+    private final PIDController pidController = new PIDController(Constants.Climber.kP, Constants.Climber.kI,
+            Constants.Climber.kD);
 
     public void setSpeed(double speed) {
-        climberMoter.set(speed * Constants.Climber.GEARBOX_RATIO);
+        climberMotor.set(speed * Constants.Climber.GEARBOX_RATIO);
     }
 }

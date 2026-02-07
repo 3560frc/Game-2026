@@ -13,11 +13,4 @@ public class CommandIntake extends SubsystemBase {
     m_intake_motor.set(speed);
   }
 
-  // public void runIntake() {
-  //   m_motor.set(0.8);
-  // }
-
-  // public void stopIntake() {
-  //   m_motor.set(0.0);
-  // }
 }
