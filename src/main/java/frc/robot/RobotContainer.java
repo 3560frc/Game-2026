@@ -21,6 +21,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandClimber;
 import frc.robot.subsystems.CommandIntake;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.CommandClimber.ClimberState;
 
 public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
@@ -96,16 +97,16 @@ public class RobotContainer {
                 // Climber Buttons
                 // Go Up (X BTN)
                 joystick.x()
-                                .onTrue(new InstantCommand(() -> climberSystem.setSpeed(Constants.Climber.MOTOR_SPEED),
+                                .onTrue(new InstantCommand(() -> climberSystem.setMovement(ClimberState.UP),
                                                 climberSystem))
-                                .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
+                                .onFalse(new InstantCommand(() -> climberSystem.setMovement(ClimberState.STOP),
                                                 climberSystem));
 
                 // Go Down (Y BTN)
                 joystick.y()
-                                .onTrue(new InstantCommand(() -> climberSystem.setSpeed(-Constants.Climber.MOTOR_SPEED),
+                                .onTrue(new InstantCommand(() -> climberSystem.setMovement(ClimberState.DOWN),
                                                 climberSystem))
-                                .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
+                                .onFalse(new InstantCommand(() -> climberSystem.setMovement(ClimberState.STOP),
                                                 climberSystem));
 
                 // Shooter Buttons
