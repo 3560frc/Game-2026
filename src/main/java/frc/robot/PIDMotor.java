@@ -14,7 +14,7 @@ public class PIDMotor {
   private TalonFX motor;
   private boolean velocityOnly;
 
-  private PIDMotor() {
+  public PIDMotor() {
     motor = null;
   }
 

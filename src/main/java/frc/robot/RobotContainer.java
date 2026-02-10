@@ -95,14 +95,14 @@ public class RobotContainer {
                 joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
                 // Climber Buttons
-                // Go Up (X BTN)
+                // Go Down (X BTN)
                 joystick.x()
                                 .onTrue(new InstantCommand(() -> climberSystem.setMovement(ClimberState.UP),
                                                 climberSystem))
                                 .onFalse(new InstantCommand(() -> climberSystem.setMovement(ClimberState.STOP),
                                                 climberSystem));
 
-                // Go Down (Y BTN)
+                // Go Up (Y BTN)
                 joystick.y()
                                 .onTrue(new InstantCommand(() -> climberSystem.setMovement(ClimberState.DOWN),
                                                 climberSystem))
