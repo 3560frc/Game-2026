@@ -1,26 +1,51 @@
 package frc.robot;
 
+import com.ctre.phoenix6.signals.InvertedValue;
+
 public class Constants {
-    public static class Climber {
-        public static final int Motor_ID = 57;
-        public static final double MOTOR_SPEED = 10;
-        public static final double GEARBOX_RATIO = 1.0 / 50.0;
-        public static final double kP = 0.1;
-        public static final double kI = 0.01;
-        public static final double kD = 0.001;
+    public class Climber {
+        public static final int MOTOR_ID = 0;
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double kG = 0;
+        public static final double kS = 0;
+        public static final double GEAR_RATIO = 0;
+        public static final double MAX_VELOCITY_RPS = 0;
+        public static final double MAX_ACCELERATION_RPSPS = 0;
+        public static final double ROTATIONS_PER_EXTENSION = 0;
+        public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
-    public static class Intake {
-        public static final int Moter_ID = 38;
-        public static final int Hinge_Moter_ID = 39;
-        public static final double MOTOR_SPEED = 5;
+    public class IntakeHinge {
+        public static final int MOTOR_ID = 0;
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double kG = 0;
+        public static final double kS = 0;
+        public static final double GEAR_RATIO = 1.0;
+        public static final double MAX_VELOCITY_RPS = 0;
+        public static final double MAX_ACCELERATION_RPSPS = 0;
+        public static final double ROTATIONS_PER_EXTENSION = 0;
+        public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
-    public static class Shooter {
-        public static final int Moter_ID_1 = 0;
-        public static final double MOTOR_SPEED_1 = 1;
-
-        public static final int Motor_ID_2 = 1;
-        public static final double MOTOR_SPEED_2 = 1;
+    public class IntakeRoller {
+        public static final int MOTOR_ID = 0;
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double VELOCITY_RPS = 0;
+        public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
+    }
+    
+    public class ShooterRoller {
+        public static final int MOTOR_ID = 0;
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double VELOCITY_RPS = 0;
+        public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 }

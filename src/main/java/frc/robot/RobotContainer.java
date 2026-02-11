@@ -96,31 +96,31 @@ public class RobotContainer {
                 // Climber Buttons
                 // Go Up (X BTN)
                 joystick.x()
-                                .onTrue(new InstantCommand(() -> climberSystem.setSpeed(Constants.Climber.MOTOR_SPEED),
+                                .onTrue(new InstantCommand(() -> climberSystem.setClimbExtended(true),
                                                 climberSystem))
-                                .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
+                                .onFalse(new InstantCommand(() -> climberSystem.setClimbExtended(false),
                                                 climberSystem));
 
                 // Go Down (Y BTN)
-                joystick.y()
-                                .onTrue(new InstantCommand(() -> climberSystem.setSpeed(-Constants.Climber.MOTOR_SPEED),
-                                                climberSystem))
-                                .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
-                                                climberSystem));
+                //joystick.y()
+                //                .onTrue(new InstantCommand(() -> climberSystem.setSpeed(0),
+                //                                climberSystem))
+                //                .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
+                //                                climberSystem));
 
-                // Shooter Buttons
+                // Intake Buttons
                 // Forward (Right Trigger)
                 joystick.rightTrigger()
-                                .onTrue(new InstantCommand(() -> intakeSystem.setSpeed(Constants.Intake.MOTOR_SPEED),
+                                .onTrue(new InstantCommand(() -> intakeSystem.setIntakeRollerEnabled(true),
                                                 intakeSystem))
-                                .onFalse(new InstantCommand(() -> intakeSystem.setSpeed(0),
+                                .onFalse(new InstantCommand(() -> intakeSystem.setIntakeRollerEnabled(false),
                                                 intakeSystem));
 
                 // Backward (Left Trigger)
                 joystick.leftTrigger()
-                                .onTrue(new InstantCommand(() -> intakeSystem.setSpeed(-Constants.Intake.MOTOR_SPEED),
+                                .onTrue(new InstantCommand(() -> intakeSystem.setIntakeExtended(true),
                                                 intakeSystem))
-                                .onFalse(new InstantCommand(() -> intakeSystem.setSpeed(0),
+                                .onFalse(new InstantCommand(() -> intakeSystem.setIntakeExtended(false),
                                                 intakeSystem));
                 drivetrain.registerTelemetry(logger::telemeterize);
         }

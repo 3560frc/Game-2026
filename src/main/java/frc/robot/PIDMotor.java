@@ -12,16 +12,14 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 public class PIDMotor {
   private TalonFX motor;
-  private boolean velocityOnly;
 
   private PIDMotor() {
     motor = null;
   }
 
-  public static PIDMotor init(int motorID, SlotConfigs slotConfigs, double gearRatio, boolean velocityOnly,
+  public static PIDMotor init(int motorID, SlotConfigs slotConfigs, MotionMagicConfigs mmconfigs, double gearRatio,
       InvertedValue direction) {
     PIDMotor self = new PIDMotor();
-    self.velocityOnly = velocityOnly;
 
     self.motor = new TalonFX(motorID);
     FeedbackConfigs configs = new FeedbackConfigs();
@@ -32,18 +30,14 @@ public class PIDMotor {
     Slot0Configs slot0Configs = Slot0Configs.from(slotConfigs);
     self.motor.getConfigurator().apply(slot0Configs);
 
-    if (!velocityOnly) {
-      MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
-      motionMagicConfigs.MotionMagicAcceleration = 1500;
-      motionMagicConfigs.MotionMagicCruiseVelocity = 1500;
-
-      self.motor.getConfigurator().apply(motionMagicConfigs);
+    if (mmconfigs != null) {
+      self.motor.getConfigurator().apply(mmconfigs);
     }
 
     return self;
   }
 
-  private SlotConfigs createSlotConfigs(double kP, double kI, double kD) {
+  private static SlotConfigs createSlotConfigs(double kP, double kI, double kD) {
     SlotConfigs slotConfigs = new SlotConfigs();
     slotConfigs.kP = kP;
     slotConfigs.kI = kI;
@@ -51,17 +45,16 @@ public class PIDMotor {
     return slotConfigs;
   }
 
-  public PIDMotor init(int motorId, double kP, double kI, double kD, boolean velocityOnly, InvertedValue direction) {
-    return init(motorId, createSlotConfigs(kP, kI, kD), 1.0, velocityOnly, direction);
+  public static PIDMotor initVelocityOnly(int motorId, double kP, double kI, double kD, InvertedValue direction) {
+    return init(motorId, createSlotConfigs(kP, kI, kD), null, 1.0, direction);
   }
 
   public void setVelocity(double targetRPS) {
     motor.setControl(new VelocityDutyCycle(targetRPS));
   }
 
-  public void set(double target) {
-    assert (!velocityOnly);
+  public void set(double targetRotations) {
     MotionMagicVoltage request = new MotionMagicVoltage(0).withSlot(0);
-    motor.setControl(request.withPosition(target));
+    motor.setControl(request.withPosition(targetRotations));
   }
 }
