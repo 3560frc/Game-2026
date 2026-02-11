@@ -57,17 +57,17 @@ public class RobotContainer {
 
         // Pathplanner needs this to know how to call stuff
         private void registerCommands() {
-                //Intake
+                // Intake
                 NamedCommands.registerCommand("enable_intake_rollers", intakeSystem.setIntakeRollerEnabled(true));
                 NamedCommands.registerCommand("disable_intake_rollers", intakeSystem.setIntakeRollerEnabled(false));
                 NamedCommands.registerCommand("extend_intake", intakeSystem.setIntakeExtended(true));
                 NamedCommands.registerCommand("retract_intake", intakeSystem.setIntakeExtended(false));
-                
-                //Shooter
+
+                // Shooter
                 NamedCommands.registerCommand("enable_shooter_rollers", shooterSystem.setState(true));
                 NamedCommands.registerCommand("disable_shooter_rollers", shooterSystem.setState(false));
 
-                //Climber
+                // Climber
                 NamedCommands.registerCommand("extend_climber", climberSystem.setClimbExtended(true));
                 NamedCommands.registerCommand("retract_climber", climberSystem.setClimbExtended(false));
         }
@@ -115,16 +115,15 @@ public class RobotContainer {
 
                 // Climber Buttons
                 // Go Up (X BTN)
-                joystick.x()
-                                .onTrue(climberSystem.setClimbExtended(true))
-                                .onFalse(climberSystem.setClimbExtended(false));
+                joystick.x().onChange(climberSystem.toggleClimbExtended());
+                joystick.y().onChange(climberSystem.toggleClimbExtended());
 
                 // Go Down (Y BTN)
-                //joystick.y()
-                //                .onTrue(new InstantCommand(() -> climberSystem.setSpeed(0),
-                //                                climberSystem))
-                //                .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
-                //                                climberSystem));
+                // joystick.y()
+                // .onTrue(new InstantCommand(() -> climberSystem.setSpeed(0),
+                // climberSystem))
+                // .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
+                // climberSystem));
 
                 // Intake Buttons
                 // Forward (Right Trigger)

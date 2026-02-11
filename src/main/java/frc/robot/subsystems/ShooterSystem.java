@@ -9,12 +9,16 @@ import frc.robot.PIDMotor;
 
 public class ShooterSystem extends SubsystemBase {
   PIDMotor intakeMotor = PIDMotor.initVelocityOnly(
-    Constants.ShooterRoller.MOTOR_ID, 
-    Constants.ShooterRoller.kP, 
-    Constants.ShooterRoller.kI, 
-    Constants.ShooterRoller.kD, 
-    InvertedValue.Clockwise_Positive
-  );
+      Constants.ShooterRoller.MOTOR_ID,
+      Constants.ShooterRoller.kP,
+      Constants.ShooterRoller.kI,
+      Constants.ShooterRoller.kD,
+      InvertedValue.Clockwise_Positive);
+
+  @Override
+  public void periodic() {
+    intakeMotor.update();
+  }
 
   public Command setState(boolean enabled) {
     return run(() -> {
