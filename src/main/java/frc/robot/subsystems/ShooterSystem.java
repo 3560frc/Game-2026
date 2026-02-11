@@ -2,11 +2,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PIDMotor;
 
-public class CommandShooter extends SubsystemBase {
+public class ShooterSystem extends SubsystemBase {
   PIDMotor intakeMotor = PIDMotor.initVelocityOnly(
     Constants.ShooterRoller.MOTOR_ID, 
     Constants.ShooterRoller.kP, 
@@ -15,11 +16,13 @@ public class CommandShooter extends SubsystemBase {
     InvertedValue.Clockwise_Positive
   );
 
-  public void setState(boolean enabled) {
-    if (enabled) {
-      intakeMotor.setVelocity(5);
-    } else {
-      intakeMotor.setVelocity(0);
-    }
+  public Command setState(boolean enabled) {
+    return run(() -> {
+      if (enabled) {
+        intakeMotor.setVelocity(5);
+      } else {
+        intakeMotor.setVelocity(0);
+      }
+    });
   }
 }

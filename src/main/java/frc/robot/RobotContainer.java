@@ -7,19 +7,20 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandClimber;
-import frc.robot.subsystems.CommandIntake;
+import frc.robot.subsystems.ClimberSystem;
+import frc.robot.subsystems.IntakeSystem;
+import frc.robot.subsystems.ShooterSystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
@@ -45,11 +46,30 @@ public class RobotContainer {
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
         // SubSystems
-        private final CommandClimber climberSystem = new CommandClimber();
-        private final CommandIntake intakeSystem = new CommandIntake();
+        private final ClimberSystem climberSystem = new ClimberSystem();
+        private final IntakeSystem intakeSystem = new IntakeSystem();
+        private final ShooterSystem shooterSystem = new ShooterSystem();
 
         public RobotContainer() {
                 configureBindings();
+                registerCommands();
+        }
+
+        // Pathplanner needs this to know how to call stuff
+        private void registerCommands() {
+                //Intake
+                NamedCommands.registerCommand("enable_intake_rollers", intakeSystem.setIntakeRollerEnabled(true));
+                NamedCommands.registerCommand("disable_intake_rollers", intakeSystem.setIntakeRollerEnabled(false));
+                NamedCommands.registerCommand("extend_intake", intakeSystem.setIntakeExtended(true));
+                NamedCommands.registerCommand("retract_intake", intakeSystem.setIntakeExtended(false));
+                
+                //Shooter
+                NamedCommands.registerCommand("enable_shooter_rollers", shooterSystem.setState(true));
+                NamedCommands.registerCommand("disable_shooter_rollers", shooterSystem.setState(false));
+
+                //Climber
+                NamedCommands.registerCommand("extend_climber", climberSystem.setClimbExtended(true));
+                NamedCommands.registerCommand("retract_climber", climberSystem.setClimbExtended(false));
         }
 
         private void configureBindings() {
@@ -96,10 +116,8 @@ public class RobotContainer {
                 // Climber Buttons
                 // Go Up (X BTN)
                 joystick.x()
-                                .onTrue(new InstantCommand(() -> climberSystem.setClimbExtended(true),
-                                                climberSystem))
-                                .onFalse(new InstantCommand(() -> climberSystem.setClimbExtended(false),
-                                                climberSystem));
+                                .onTrue(climberSystem.setClimbExtended(true))
+                                .onFalse(climberSystem.setClimbExtended(false));
 
                 // Go Down (Y BTN)
                 //joystick.y()
@@ -111,17 +129,13 @@ public class RobotContainer {
                 // Intake Buttons
                 // Forward (Right Trigger)
                 joystick.rightTrigger()
-                                .onTrue(new InstantCommand(() -> intakeSystem.setIntakeRollerEnabled(true),
-                                                intakeSystem))
-                                .onFalse(new InstantCommand(() -> intakeSystem.setIntakeRollerEnabled(false),
-                                                intakeSystem));
+                                .onTrue(intakeSystem.setIntakeRollerEnabled(true))
+                                .onFalse(intakeSystem.setIntakeRollerEnabled(false));
 
                 // Backward (Left Trigger)
                 joystick.leftTrigger()
-                                .onTrue(new InstantCommand(() -> intakeSystem.setIntakeExtended(true),
-                                                intakeSystem))
-                                .onFalse(new InstantCommand(() -> intakeSystem.setIntakeExtended(false),
-                                                intakeSystem));
+                                .onTrue(intakeSystem.setIntakeExtended(true))
+                                .onFalse(intakeSystem.setIntakeExtended(false));
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 

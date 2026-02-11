@@ -3,11 +3,12 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PIDMotor;
 
-public class CommandIntake extends SubsystemBase {
+public class IntakeSystem extends SubsystemBase {
   PIDMotor hingeMotor;
   PIDMotor intakeMotor = PIDMotor.initVelocityOnly(
     Constants.IntakeRoller.MOTOR_ID, 
@@ -17,7 +18,7 @@ public class CommandIntake extends SubsystemBase {
     Constants.IntakeRoller.DIRECTION
   );
 
-  public CommandIntake() {
+  public IntakeSystem() {
     SlotConfigs configs = new SlotConfigs();
     configs.kP = Constants.IntakeHinge.kP;
     configs.kI = Constants.IntakeHinge.kI;
@@ -32,19 +33,23 @@ public class CommandIntake extends SubsystemBase {
     hingeMotor = PIDMotor.init(Constants.IntakeHinge.MOTOR_ID, configs, mmconfigs, 1.0, Constants.IntakeHinge.DIRECTION);
   }
 
-  public void setIntakeRollerEnabled(boolean enabled) {
-    if (enabled) {
-      intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
-    } else {
-      intakeMotor.setVelocity(0);
-    }
+  public Command setIntakeRollerEnabled(boolean enabled) {
+    return run(() -> {
+      if (enabled) {
+        intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
+      } else {
+        intakeMotor.setVelocity(0);
+      }
+    });
   }
 
-  public void setIntakeExtended(boolean extended) {
-    if (extended) {
-      hingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
-    } else {
-      hingeMotor.set(0);
-    }
+  public Command setIntakeExtended(boolean extended) {
+    return run(() -> {
+      if (extended) {
+        hingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+      } else {
+        hingeMotor.set(0);
+      }
+    });
   }
 }
