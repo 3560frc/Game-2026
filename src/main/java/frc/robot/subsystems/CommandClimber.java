@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class CommandClimber extends SubsystemBase {
-    private final TalonFX climberMoter = new TalonFX(Constants.Climber.Moter_ID);
+    private final TalonFX climberMoter = new TalonFX(Constants.Climber.Motor_ID);
     private final PIDController pidController = new PIDController(Constants.Climber.kP, Constants.Climber.kI,
             Constants.Climber.kD);
 
     public void setSpeed(double speed) {
-        climberMotor.set(speed * Constants.Climber.GEARBOX_RATIO);
+        climberMoter.set(speed);
     }
 }

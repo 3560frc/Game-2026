@@ -94,21 +94,21 @@ public class RobotContainer {
                 joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
                 // Climber Buttons
-                // Go Up (X BTN)
+                // Go Down (X BTN)
                 joystick.x()
                                 .onTrue(new InstantCommand(() -> climberSystem.setSpeed(Constants.Climber.MOTOR_SPEED),
                                                 climberSystem))
                                 .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
                                                 climberSystem));
 
-                // Go Down (Y BTN)
+                // Go Up (Y BTN)
                 joystick.y()
                                 .onTrue(new InstantCommand(() -> climberSystem.setSpeed(-Constants.Climber.MOTOR_SPEED),
                                                 climberSystem))
                                 .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
                                                 climberSystem));
 
-                // Shooter Buttons
+                // Intake Buttons
                 // Forward (Right Trigger)
                 joystick.rightTrigger()
                                 .onTrue(new InstantCommand(() -> intakeSystem.setSpeed(Constants.Intake.MOTOR_SPEED),
