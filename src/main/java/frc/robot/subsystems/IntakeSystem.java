@@ -18,6 +18,8 @@ public class IntakeSystem extends SubsystemBase {
       Constants.IntakeRoller.kD,
       Constants.IntakeRoller.DIRECTION);
 
+  IntakeState state;
+
   public IntakeSystem() {
     SlotConfigs configs = new SlotConfigs();
     configs.kP = Constants.IntakeHinge.kP;
@@ -35,28 +37,62 @@ public class IntakeSystem extends SubsystemBase {
         Constants.IntakeHinge.DIRECTION);
   }
 
+  public enum IntakeDirection {
+    FORWARD,
+    REVERSE,
+    STOP
+  }
+
   @Override
   public void periodic() {
     intakeMotor.update();
     hingeMotor.update();
   }
 
-  public Command setIntakeRollerEnabled(boolean enabled) {
+  public Command setIntakeRollerEnabled(boolean enabled, IntakeDirection direction) {
     return run(() -> {
       if (enabled) {
-        intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
+        if (direction == IntakeDirection.FORWARD) {
+          intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
+        }
+
+        if (direction == IntakeDirection.REVERSE) {
+          intakeMotor.setVelocity(-Constants.IntakeRoller.VELOCITY_RPS);
+        }
       } else {
         intakeMotor.setVelocity(0);
       }
     });
   }
 
-  public Command setIntakeExtended(boolean extended) {
+  public enum IntakeState {
+    HOVERING,
+    RETRACTED,
+    DOWN
+  }
+
+  public Command toggleIntakeExtended() {
+    if (this.state == IntakeState.HOVERING) {
+      this.state = IntakeState.RETRACTED;
+    } else {
+      this.state = IntakeState.HOVERING;
+    }
+
+    return setIntakeExtended(this.state);
+  }
+
+  public Command setIntakeExtended(IntakeState state) {
     return run(() -> {
-      if (extended) {
-        hingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
-      } else {
-        hingeMotor.set(0);
+      switch (state) {
+        case HOVERING:
+          hingeMotor.set(Constants.IntakeHinge.HOVER_SETPOINT_ROTATIONS);
+          break;
+        case RETRACTED:
+          hingeMotor.set(Constants.IntakeHinge.RETRACTED_SETPOINT_ROTATIONS);
+          break;
+        case DOWN:
+          hingeMotor.set(0);
+          break;
       }
     });
   }

@@ -7,7 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.pathplanner.lib.auto.NamedCommands;
+//import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +21,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSystem;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.ShooterSystem;
+import frc.robot.subsystems.IntakeSystem.IntakeDirection;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
@@ -58,39 +59,48 @@ public class RobotContainer {
         // Pathplanner needs this to know how to call stuff
         private void registerCommands() {
                 // Intake
-                NamedCommands.registerCommand("enable_intake_rollers", intakeSystem.setIntakeRollerEnabled(true));
-                NamedCommands.registerCommand("disable_intake_rollers", intakeSystem.setIntakeRollerEnabled(false));
-                NamedCommands.registerCommand("extend_intake", intakeSystem.setIntakeExtended(true));
-                NamedCommands.registerCommand("retract_intake", intakeSystem.setIntakeExtended(false));
+                // NamedCommands.registerCommand("enable_intake_rollers",
+                // intakeSystem.setIntakeRollerEnabled(true));
+                // NamedCommands.registerCommand("disable_intake_rollers",
+                // intakeSystem.setIntakeRollerEnabled(false));
+                // NamedCommands.registerCommand("extend_intake",
+                // intakeSystem.setIntakeExtended(true));
+                // NamedCommands.registerCommand("retract_intake",
+                // intakeSystem.setIntakeExtended(false));
 
-                // Shooter
-                NamedCommands.registerCommand("enable_shooter_rollers", shooterSystem.setState(true));
-                NamedCommands.registerCommand("disable_shooter_rollers", shooterSystem.setState(false));
+                // // Shooter
+                // NamedCommands.registerCommand("enable_shooter_rollers",
+                // shooterSystem.setState(true));
+                // NamedCommands.registerCommand("disable_shooter_rollers",
+                // shooterSystem.setState(false));
 
-                // Climber
-                NamedCommands.registerCommand("extend_climber", climberSystem.setClimbExtended(true));
-                NamedCommands.registerCommand("retract_climber", climberSystem.setClimbExtended(false));
+                // // Climber
+                // NamedCommands.registerCommand("extend_climber",
+                // climberSystem.setClimbExtended(true));
+                // NamedCommands.registerCommand("retract_climber",
+                // climberSystem.setClimbExtended(false));
         }
 
         private void configureBindings() {
                 // Note that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
-                                // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive
-                                                                                                                   // forward
-                                                                                                                   // with
-                                                                                                                   // negative
-                                                                                                                   // Y
-                                                                                                                   // (forward)
-                                                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with
-                                                                                                // negative X (left)
-                                                .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive
-                                                                                                            // counterclockwise
-                                                                                                            // with
-                                                                                                            // negative
-                                                                                                            // X (left)
-                                ));
+                // // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() *
+                MaxSpeed) // Drive
+                // forward
+                // with
+                // negative
+                // Y
+                // (forward)
+                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with
+                // negative X (left)
+                .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive
+                // counterclockwise
+                // with
+                // negative
+                // X (left)
+                ));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -115,26 +125,27 @@ public class RobotContainer {
 
                 // Climber Buttons
                 // Go Up (X BTN)
-                joystick.x().onChange(climberSystem.toggleClimbExtended());
-                joystick.y().onChange(climberSystem.toggleClimbExtended());
-
-                // Go Down (Y BTN)
-                // joystick.y()
-                // .onTrue(new InstantCommand(() -> climberSystem.setSpeed(0),
-                // climberSystem))
-                // .onFalse(new InstantCommand(() -> climberSystem.setSpeed(0),
-                // climberSystem));
+                // joystick.x().onChange(climberSystem.toggleClimbExtended());
+                // joystick.y().onChange(climberSystem.toggleClimbExtended());
 
                 // Intake Buttons
-                // Forward (Right Trigger)
-                joystick.rightTrigger()
-                                .onTrue(intakeSystem.setIntakeRollerEnabled(true))
-                                .onFalse(intakeSystem.setIntakeRollerEnabled(false));
-
-                // Backward (Left Trigger)
+                // Forward (Right Bumper)
+                joystick.rightBumper().onTrue(intakeSystem.toggleIntakeExtended());
+ 
                 joystick.leftTrigger()
-                                .onTrue(intakeSystem.setIntakeExtended(true))
-                                .onFalse(intakeSystem.setIntakeExtended(false));
+                                .whileTrue(intakeSystem.setIntakeRollerEnabled(true, IntakeDirection.REVERSE))
+                                .whileFalse(intakeSystem.setIntakeRollerEnabled(false, IntakeDirection.STOP));
+
+                // (Left Bumper)
+                joystick.x()
+                                .whileTrue(intakeSystem.setIntakeExtended(IntakeSystem.IntakeState.RETRACTED))
+                                .whileFalse(intakeSystem.setIntakeExtended(IntakeSystem.IntakeState.HOVERING));
+
+                // Shooter Buttons
+                joystick.rightTrigger()
+                                .whileTrue(shooterSystem.setState(true))
+                                .whileFalse(shooterSystem.setState(false));
+
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 
