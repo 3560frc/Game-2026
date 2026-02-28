@@ -4,25 +4,28 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 //import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSystem;
-import frc.robot.subsystems.IntakeSystem;
-import frc.robot.subsystems.ShooterSystem;
-import frc.robot.subsystems.IntakeSystem.IntakeDirection;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakeSystem;
+import frc.robot.subsystems.IntakeSystem.IntakeDirection;
+import frc.robot.subsystems.ShooterSystem;
 
 public class RobotContainer {
         private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
@@ -51,9 +54,12 @@ public class RobotContainer {
         private final IntakeSystem intakeSystem = new IntakeSystem();
         private final ShooterSystem shooterSystem = new ShooterSystem();
 
+        private final PowerDistribution pdp = new PowerDistribution(0, ModuleType.kRev);
+
         public RobotContainer() {
                 configureBindings();
                 registerCommands();
+                pdp.setSwitchableChannel(true);
         }
 
         // Pathplanner needs this to know how to call stuff
