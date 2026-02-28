@@ -54,7 +54,7 @@ public class RobotContainer {
         private final IntakeSystem intakeSystem = new IntakeSystem();
         private final ShooterSystem shooterSystem = new ShooterSystem();
 
-        private final PowerDistribution pdp = new PowerDistribution(0, ModuleType.kRev);
+        private final PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
 
         public RobotContainer() {
                 configureBindings();
