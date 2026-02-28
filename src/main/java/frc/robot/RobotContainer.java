@@ -131,8 +131,7 @@ public class RobotContainer {
 
                 // Climber Buttons
                 // Go Up (X BTN)
-                // joystick.x().onChange(climberSystem.toggleClimbExtended());
-                // joystick.y().onChange(climberSystem.toggleClimbExtended());
+                joystick.y().onTrue(climberSystem.toggleClimbExtended());
 
                 // Intake Buttons
                 // Forward (Right Bumper)
