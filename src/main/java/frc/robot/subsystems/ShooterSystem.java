@@ -1,24 +1,42 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.SlotConfigs;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PIDMotor;
 
 public class ShooterSystem extends SubsystemBase {
-  PIDMotor shooterMotor2 = PIDMotor.initVelocityOnly(
-      Constants.ShooterRoller.MOTOR_ID,
-      Constants.ShooterRoller.kP,
-      Constants.ShooterRoller.kI,
-      Constants.ShooterRoller.kD,
-      Constants.ShooterRoller.DIRECTION);
+  PIDMotor shooterMotor2;
+  PIDMotor shooterMotor1;
 
-  PIDMotor shooterMotor1 = PIDMotor.initVelocityOnly(
-      Constants.ShooterTop.MOTOR_ID,
-      Constants.ShooterTop.kP,
-      Constants.ShooterTop.kI,
-      Constants.ShooterTop.kD,
-      Constants.ShooterTop.DIRECTION);
+  public ShooterSystem() {
+    SlotConfigs configs = new SlotConfigs();
+    configs.kP = Constants.ShooterTop.kP;
+    configs.kI = Constants.ShooterTop.kI;
+    configs.kD = Constants.ShooterTop.kD;
+
+    MotionMagicConfigs mmconfigs = new MotionMagicConfigs();
+    mmconfigs.MotionMagicAcceleration = Constants.ShooterTop.MAX_ACCELERATION_RPSPS;
+    mmconfigs.MotionMagicCruiseVelocity = Constants.ShooterTop.MAX_VELOCITY_RPS;
+
+    shooterMotor2 = PIDMotor.init(Constants.ShooterTop.MOTOR_ID, configs, mmconfigs, 1.0,
+        Constants.ShooterTop.DIRECTION);
+
+    SlotConfigs configs1 = new SlotConfigs();
+    configs.kP = Constants.ShooterRoller.kP;
+    configs.kI = Constants.ShooterRoller.kI;
+    configs.kD = Constants.ShooterRoller.kD;
+
+    MotionMagicConfigs mmconfigs1 = new MotionMagicConfigs();
+    mmconfigs.MotionMagicAcceleration = Constants.ShooterRoller.MAX_ACCELERATION_RPSPS;
+    mmconfigs.MotionMagicCruiseVelocity = Constants.ShooterRoller.MAX_VELOCITY_RPS;
+
+    shooterMotor1 = PIDMotor.init(Constants.ShooterRoller.MOTOR_ID, configs1, mmconfigs1, 1.0,
+        Constants.ShooterRoller.DIRECTION);
+  }
 
   @Override
   public void periodic() {

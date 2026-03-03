@@ -1,15 +1,13 @@
 package frc.robot;
 
-import javax.lang.model.type.UnionType;
-
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicVelocityDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
@@ -45,20 +43,8 @@ public class PIDMotor {
     motor.setControl(request);
   }
 
-  private static SlotConfigs createSlotConfigs(double kP, double kI, double kD) {
-    SlotConfigs slotConfigs = new SlotConfigs();
-    slotConfigs.kP = kP;
-    slotConfigs.kI = kI;
-    slotConfigs.kD = kD;
-    return slotConfigs;
-  }
-
-  public static PIDMotor initVelocityOnly(int motorId, double kP, double kI, double kD, InvertedValue direction) {
-    return init(motorId, createSlotConfigs(kP, kI, kD), null, 1.0, direction);
-  }
-
   public void setVelocity(double targetRPS) {
-    this.request = new VelocityDutyCycle(targetRPS);
+    this.request = new MotionMagicVelocityDutyCycle(targetRPS);
   }
 
   public void set(double targetRotations) {
