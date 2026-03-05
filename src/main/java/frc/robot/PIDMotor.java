@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 public class PIDMotor {
   private TalonFX motor;
   private ControlRequest request;
+  public boolean disabled;
 
   private PIDMotor() {
     motor = null;
@@ -40,7 +41,9 @@ public class PIDMotor {
   }
 
   public void update() {
-    motor.setControl(request);
+    if (!disabled) {
+      motor.setControl(request);
+    }
   }
 
   public void setVelocity(double targetRPS) {

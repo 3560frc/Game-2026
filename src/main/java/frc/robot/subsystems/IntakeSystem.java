@@ -56,6 +56,9 @@ public class IntakeSystem extends SubsystemBase {
 
   public Command setIntakeRollerEnabled(boolean enabled, IntakeDirection direction) {
     return run(() -> {
+      System.out.println(direction);
+      System.out.println(enabled);
+
       if (enabled) {
         if (direction == IntakeDirection.FORWARD) {
           intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
@@ -88,6 +91,7 @@ public class IntakeSystem extends SubsystemBase {
 
   public Command setIntakeExtended(IntakeState state) {
     return run(() -> {
+      System.out.println(state);
       switch (state) {
         case HOVERING:
           hingeMotor.set(Constants.IntakeHinge.HOVER_SETPOINT_ROTATIONS);
