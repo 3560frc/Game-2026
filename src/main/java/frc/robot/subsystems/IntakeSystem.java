@@ -30,13 +30,13 @@ public class IntakeSystem extends SubsystemBase {
         Constants.IntakeHinge.DIRECTION);
 
     SlotConfigs configs1 = new SlotConfigs();
-    configs.kP = Constants.IntakeRoller.kP;
-    configs.kI = Constants.IntakeRoller.kI;
-    configs.kD = Constants.IntakeRoller.kD;
+    configs1.kP = Constants.IntakeRoller.kP;
+    configs1.kI = Constants.IntakeRoller.kI;
+    configs1.kD = Constants.IntakeRoller.kD;
 
     MotionMagicConfigs mmconfigs1 = new MotionMagicConfigs();
-    mmconfigs.MotionMagicAcceleration = Constants.IntakeRoller.MAX_ACCELERATION_RPSPS;
-    mmconfigs.MotionMagicCruiseVelocity = Constants.IntakeRoller.MAX_VELOCITY_RPS;
+    mmconfigs1.MotionMagicAcceleration = Constants.IntakeRoller.MAX_ACCELERATION_RPSPS;
+    mmconfigs1.MotionMagicCruiseVelocity = Constants.IntakeRoller.MAX_VELOCITY_RPS;
 
     intakeMotor = PIDMotor.init(Constants.IntakeRoller.MOTOR_ID, configs1, mmconfigs1, 1.0,
         Constants.IntakeRoller.DIRECTION);
