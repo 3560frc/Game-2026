@@ -16,7 +16,7 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
-        private final PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
+    private final PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
 
     /* log and replay timestamp and joystick data */
     private final HootAutoReplay m_timeAndJoystickReplay = new HootAutoReplay()
@@ -25,6 +25,10 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         m_robotContainer = new RobotContainer();
+    }
+
+    @Override
+    public void robotInit() {
         pdp.setSwitchableChannel(true);
     }
 
@@ -32,7 +36,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run();
-    }  
+    }
 
     @Override
     public void disabledInit() {

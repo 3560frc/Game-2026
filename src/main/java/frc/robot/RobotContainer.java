@@ -10,17 +10,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathPlannerPath;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -30,11 +23,13 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.IntakeSystem.IntakeDirection;
 import frc.robot.subsystems.ShooterSystem;
+// Jittering when goes fast
+// Toggles don't work
+// Climb doesn't work properly
 
 public class RobotContainer {
-        private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
+        private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
                                                                                             // top
-                                                                                            // speed
         private double MaxAngularRate = RotationsPerSecond.of(0.55).in(RadiansPerSecond); // 3/4 of a rotation per
                                                                                           // second
                                                                                           // max angular velocity
@@ -57,8 +52,10 @@ public class RobotContainer {
         private final ClimberSystem climberSystem = new ClimberSystem();
         private final IntakeSystem intakeSystem = new IntakeSystem();
         private final ShooterSystem shooterSystem = new ShooterSystem();
+        // private final VisionSystem vision;
 
         public RobotContainer() {
+                // vision = new VisionSystem(drivetrain);
                 configureBindings();
                 registerCommands();
         }
@@ -89,10 +86,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                // // Note that X is defined as forward according to WPILib convention,
-                // // and Y is defined as to the left according to WPILib convention.
                 drivetrain.setDefaultCommand(
-                                // // Drivetrain will execute this command periodically
                                 drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() *
                                                 MaxSpeed) // Drive
                                                 // forward
@@ -115,7 +109,8 @@ public class RobotContainer {
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-                joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+                joystick.a().onTrue(shooterSystem.toggleStorage());
+                // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
                 joystick.b().whileTrue(drivetrain.applyRequest(() -> point
                                 .withModuleDirection(new Rotation2d(joystick.getRightY(), joystick.getRightX()))));
 
@@ -155,12 +150,7 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
-                try {
-                        PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
-                        return AutoBuilder.followPath(path);
-                } catch (Exception e) {
-                        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-                        return Commands.none();
-                }
+                // return vision.autoCommand();
+                return null;
         }
 }

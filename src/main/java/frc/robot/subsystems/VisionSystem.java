@@ -1,79 +1,99 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModulePosition;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 
 public class VisionSystem extends SubsystemBase {
-    private SwerveDrivePoseEstimator m_poseEstimator;
-    private Pigeon2 m_gyro;
-    private ModulePosition position;
+  private SwerveDrivePoseEstimator m_poseEstimator;
+  private Pigeon2 m_gyro;
+  private CommandSwerveDrivetrain m_drivetrain;
+  private SwerveRequest.ApplyRobotSpeeds m_drive;
 
-    // IDK about the rest of these params
-    public VisionSystem() {
-        m_poseEstimator = new SwerveDrivePoseEstimator(null, m_gyro.getRotation2d(), null, null);
+  private ChassisSpeeds getRobotRelativeSpeeds() {
+    SwerveDriveState drivetrain_state = m_drivetrain.getState();
+    return drivetrain_state.Speeds;
+  }
 
-        RobotConfig config;
-        try {
-            config = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            // Handle exception as needed
-            e.printStackTrace();
-        }
+  private void driveRobotRelative(ChassisSpeeds speeds) {
+    m_drivetrain.setControl(m_drive.withSpeeds(speeds));
+  }
 
-        // Configure AutoBuilder last
-        AutoBuilder.configure(
-                () -> m_poseEstimator.getEstimatedPosition(), // Robot pose supplier
-                () -> m_poseEstimator.resetPose(), // Method to reset odometry (will be called if your auto has a
-                                                   // starting pose)
-                this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT
-                                                                      // RELATIVE ChassisSpeeds. Also optionally outputs
-                                                                      // individual module feedforwards
-                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for
-                                                // holonomic drive trains
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-                ),
-                config, // The robot configuration
-                () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red
-                    // alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+  public VisionSystem(CommandSwerveDrivetrain drivetrain) {
+    m_drivetrain = drivetrain;
+    m_gyro = drivetrain.getPigeon2();
+    m_drive = new SwerveRequest.ApplyRobotSpeeds();
 
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
-                },
-                this // Reference to this subsystem to set requirements
-        );
-    }
+    SwerveDriveState drivetrain_state = m_drivetrain.getState();
+    m_poseEstimator = new SwerveDrivePoseEstimator(
+        m_drivetrain.getKinematics(),
+        m_gyro.getRotation2d(),
+        drivetrain_state.ModulePositions,
+        drivetrain_state.Pose);
 
-    public Command updateRobotPose() {
-        return run(() -> {
-            m_poseEstimator.update(m_gyro.getRotation2d(), null);
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
 
-            LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
-
-            if (limelightMeasurement.tagCount >= 2) { // Only trust measurement if we see multiple tags
-                m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
-                m_poseEstimator.addVisionMeasurement(
-                        limelightMeasurement.pose,
-                        limelightMeasurement.timestampSeconds);
+      AutoBuilder.configure(
+          () -> m_poseEstimator.getEstimatedPosition(),
+          (pose) -> m_poseEstimator.resetPose(pose),
+          this::getRobotRelativeSpeeds,
+          (speeds, feedforwards) -> driveRobotRelative(speeds),
+          new PPHolonomicDriveController(
+              new PIDConstants(5.0, 0.0, 0.0),
+              new PIDConstants(5.0, 0.0, 0.0)),
+          config,
+          () -> {
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
             }
-        });
+            return false;
+          },
+          this);
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
     }
+  }
+
+  @Override
+  public void periodic() {
+    SwerveDriveState drivetrain_state = m_drivetrain.getState();
+    m_poseEstimator.update(m_gyro.getRotation2d(), drivetrain_state.ModulePositions);
+
+    LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+
+    if (limelightMeasurement.tagCount >= 2) {
+      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
+      m_poseEstimator.addVisionMeasurement(
+          limelightMeasurement.pose,
+          limelightMeasurement.timestampSeconds);
+    }
+  }
+
+  public Command autoCommand() {
+    try {
+      PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
+      return AutoBuilder.followPath(path);
+    } catch (Exception e) {
+      DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+      return Commands.none();
+    }
+  }
 }

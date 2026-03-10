@@ -12,6 +12,7 @@ public class ShooterSystem extends SubsystemBase {
   PIDMotor shooterMotor2;
   PIDMotor shooterMotor1;
   PIDMotor storageRoller;
+  boolean storageOn = false;
 
   public ShooterSystem() {
     SlotConfigs configs = new SlotConfigs();
@@ -50,7 +51,8 @@ public class ShooterSystem extends SubsystemBase {
     storageRoller = PIDMotor.init(Constants.StorageRoller.MOTOR_ID, configs2,
         mmconfigs2, 1.0, Constants.StorageRoller.DIRECTION);
 
-    storageRoller.disabled = true;
+    // shooterMotor2.disabled = true;
+    // storageRoller.disabled = true;
   }
 
   @Override
@@ -60,22 +62,31 @@ public class ShooterSystem extends SubsystemBase {
     storageRoller.update();
   }
 
+  public Command toggleStorage() {
+    return run(() -> {
+      storageOn = !storageOn;
+      if (storageOn) {
+        storageRoller.setVelocity(Constants.StorageRoller.VELOCITY_RPS);
+      } else {
+        storageRoller.setVelocity(0);
+      }
+    });
+  }
+
   public Command setState(boolean enabled) {
     return run(() -> {
       if (enabled) {
         // final int d = 210;
         // final double RPM2 = 310 * Math.sqrt(Math.pow(d, 2) / (1.73 * d - 77));
-        // final double RPM1 = 1.78 * RPM2;
+        // final double RPM1 = 1.78 * RPM2 / 2;
         // shooterMotor1.setVelocity(RPM1 / 60);
         // shooterMotor2.setVelocity(RPM2 / 60);
 
         shooterMotor1.setVelocity(Constants.ShooterRoller.VELOCITY_RPS);
         shooterMotor2.setVelocity(Constants.ShooterTop.VELOCITY_RPS);
-        storageRoller.setVelocity(Constants.StorageRoller.VELOCITY_RPS);
       } else {
         shooterMotor1.setVelocity(0);
         shooterMotor2.setVelocity(0);
-        storageRoller.setVelocity(0);
       }
     });
   }
