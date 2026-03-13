@@ -13,6 +13,8 @@ import java.text.NumberFormat.Style;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.ShooterTop;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -32,8 +35,8 @@ import frc.robot.subsystems.ShooterSystem;
 import frc.robot.subsystems.VisionSystem;
 
 public class RobotContainer {
-        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
-                                                                                      // top
+        private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
+                                                                                            // top
         private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 3/4 of a rotation per
                                                                                          // second
                                                                                          // max angular velocity
@@ -56,7 +59,7 @@ public class RobotContainer {
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
         // SubSystems
-        private final ClimberSystem climberSystem = new ClimberSystem();
+        // private final ClimberSystem climberSystem = new ClimberSystem();
         private final IntakeSystem intakeSystem = new IntakeSystem();
         private final ShooterSystem shooterSystem = new ShooterSystem();
         private final VisionSystem vision;
@@ -70,6 +73,7 @@ public class RobotContainer {
 
         // Pathplanner needs this to know how to call stuff
         private void registerCommands() {
+                // NamedCommands.registerCommand("Shoot", ShooterSystem);
                 // Intake
                 // NamedCommands.registerCommand("enable_intake_rollers",
                 // intakeSystem.setIntakeRollerEnabled(true));
@@ -91,18 +95,17 @@ public class RobotContainer {
                 // climberSystem.setClimbExtended(true));
                 // NamedCommands.registerCommand("retract_climber",
                 // climberSystem.setClimbExtended(false));
+
+                NamedCommands.registerCommand("Shoot", shooterSystem.setState(true));
         }
 
         private void configureBindings() {
+                // inverted these
                 drivetrain.setDefaultCommand(
-                                drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() *
-                                                MaxSpeed) // Drive
-                                                // forward
-                                                // with
-                                                // negative
-                                                // Y
-                                                // (forward)
-                                                .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with
+                                drivetrain.applyRequest(() -> drive
+                                                .withVelocityX(joystick.getLeftY() *
+                                                                MaxSpeed) // Drive
+                                                .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with
                                                 // negative X (left)
                                                 .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive
                                 // counterclockwise
@@ -143,10 +146,28 @@ public class RobotContainer {
                                 .whileTrue(shooterSystem.setState(true))
                                 .whileFalse(shooterSystem.setState(false));
 
+                joystick.povDown().onTrue(Commands.runOnce(() -> {
+                        shooterSystem.reverseDirection = !shooterSystem.reverseDirection;
+                }));
+
+                joystick.povLeft().onTrue(Commands.runOnce(() -> {
+                        shooterSystem.speedScale -= 0.05;
+                }));
+
+                joystick.povRight().onTrue(Commands.runOnce(() -> {
+                        shooterSystem.speedScale += 0.05;
+                }));
+
+                joystick.b().onTrue(Commands.runOnce(() -> {
+                        shooterSystem.toggleTop();
+                }));
+
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 
         public Command getAutonomousCommand() {
-                return vision.autoCommand();
+                // PathPlannerAuto auto = new PathPlannerAuto("BackShoot");
+                return null;
+                // return vision.autoCommand();
         }
 }

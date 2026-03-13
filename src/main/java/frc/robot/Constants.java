@@ -27,7 +27,7 @@ public class Constants {
         public static final double GEAR_RATIO = 1.0;
         public static final double MAX_VELOCITY_RPS = 20;
         public static final double MAX_ACCELERATION_RPSPS = 7;
-        public static final double ROTATIONS_PER_EXTENSION = 4.5;
+        public static final double ROTATIONS_PER_EXTENSION = 1.5;
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
@@ -36,9 +36,9 @@ public class Constants {
         public static final double kP = 0.015;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 45; // estimate
-        public static final double MAX_VELOCITY_RPS = 45;
-        public static final double MAX_ACCELERATION_RPSPS = 40;
+        public static final double VELOCITY_RPS = 65; // estimate
+        public static final double MAX_VELOCITY_RPS = 65;
+        public static final double MAX_ACCELERATION_RPSPS = 1500;
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
@@ -47,9 +47,9 @@ public class Constants {
         public static final double kP = 0.032;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 55;
-        public static final double MAX_VELOCITY_RPS = 55;
-        public static final double MAX_ACCELERATION_RPSPS = 25;
+        public static final double VELOCITY_RPS = 125;
+        public static final double MAX_VELOCITY_RPS = 125;
+        public static final double MAX_ACCELERATION_RPSPS = 50;
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
@@ -58,9 +58,9 @@ public class Constants {
         public static final double kP = 0.06;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 55;
-        public static final double MAX_VELOCITY_RPS = 50;
-        public static final double MAX_ACCELERATION_RPSPS = 35;
+        public static final double VELOCITY_RPS = 10;
+        public static final double MAX_VELOCITY_RPS = 10;
+        public static final double MAX_ACCELERATION_RPSPS = 150;
         // The VELOCITY_RPS was 75 WE ARE NOW CHANGING IT FOR TESTING TO 40, THANKS -
         // AIDEN M, YUVRAJ G & AAYUSH K
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;

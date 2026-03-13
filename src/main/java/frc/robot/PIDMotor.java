@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.MotionMagicVelocityDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
@@ -53,5 +54,9 @@ public class PIDMotor {
   public void set(double targetRotations) {
     MotionMagicVoltage request = new MotionMagicVoltage(targetRotations).withSlot(0);
     this.request = request;
+  }
+
+  public void stop() {
+    this.request = new VoltageOut(0);
   }
 }

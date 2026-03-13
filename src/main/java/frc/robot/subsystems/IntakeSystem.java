@@ -78,7 +78,7 @@ public class IntakeSystem extends SubsystemBase {
     if (intakeUp) {
       hingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
     } else {
-      hingeMotor.set(0);
+      hingeMotor.stop();
     }
   }
 }
