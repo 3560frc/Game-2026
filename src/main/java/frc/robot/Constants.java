@@ -14,7 +14,7 @@ public class Constants {
         public static final double MAX_VELOCITY_RPS = 360;
         public static final double MAX_ACCELERATION_RPSPS = 120;
         public static final double ROTATIONS_PER_EXTENSION = 200; // estimate
-        public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
+        public static final InvertedValue DIRECTION = InvertedValue.CounterClockwise_Positive;
     }
 
     public class IntakeHinge {
@@ -27,8 +27,7 @@ public class Constants {
         public static final double GEAR_RATIO = 1.0;
         public static final double MAX_VELOCITY_RPS = 20;
         public static final double MAX_ACCELERATION_RPSPS = 7;
-        public static final double HOVER_SETPOINT_ROTATIONS = 0.5;
-        public static final double RETRACTED_SETPOINT_ROTATIONS = 0.15;
+        public static final double ROTATIONS_PER_EXTENSION = 4.5;
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
@@ -48,20 +47,20 @@ public class Constants {
         public static final double kP = 0.032;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 45;
-        public static final double MAX_VELOCITY_RPS = 45;
+        public static final double VELOCITY_RPS = 55;
+        public static final double MAX_VELOCITY_RPS = 55;
         public static final double MAX_ACCELERATION_RPSPS = 25;
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
     public class ShooterRoller {
         public static final int MOTOR_ID = 9;
-        public static final double kP = 0.079;
+        public static final double kP = 0.06;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 60;
-        public static final double MAX_VELOCITY_RPS = 60;
-        public static final double MAX_ACCELERATION_RPSPS = 55;
+        public static final double VELOCITY_RPS = 55;
+        public static final double MAX_VELOCITY_RPS = 50;
+        public static final double MAX_ACCELERATION_RPSPS = 35;
         // The VELOCITY_RPS was 75 WE ARE NOW CHANGING IT FOR TESTING TO 40, THANKS -
         // AIDEN M, YUVRAJ G & AAYUSH K
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
@@ -72,9 +71,9 @@ public class Constants {
         public static final double kP = 0.032;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 22;
-        public static final double MAX_VELOCITY_RPS = 22;
-        public static final double MAX_ACCELERATION_RPSPS = 14;
+        public static final double VELOCITY_RPS = 5;
+        public static final double MAX_VELOCITY_RPS = 5;
+        public static final double MAX_ACCELERATION_RPSPS = 15;
         public static final InvertedValue DIRECTION = InvertedValue.CounterClockwise_Positive;
     }
 }

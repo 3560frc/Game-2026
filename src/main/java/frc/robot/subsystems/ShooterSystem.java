@@ -45,33 +45,35 @@ public class ShooterSystem extends SubsystemBase {
     configs2.kD = Constants.StorageRoller.kD;
 
     MotionMagicConfigs mmconfigs2 = new MotionMagicConfigs();
-    mmconfigs2.MotionMagicAcceleration = Constants.StorageRoller.MAX_ACCELERATION_RPSPS;
-    mmconfigs2.MotionMagicCruiseVelocity = Constants.StorageRoller.MAX_VELOCITY_RPS;
+    mmconfigs2.MotionMagicAcceleration =
+    Constants.StorageRoller.MAX_ACCELERATION_RPSPS;
+    mmconfigs2.MotionMagicCruiseVelocity =
+    Constants.StorageRoller.MAX_VELOCITY_RPS;
 
     storageRoller = PIDMotor.init(Constants.StorageRoller.MOTOR_ID, configs2,
-        mmconfigs2, 1.0, Constants.StorageRoller.DIRECTION);
+    mmconfigs2, 1.0, Constants.StorageRoller.DIRECTION);
 
-    // shooterMotor2.disabled = true;
-    // storageRoller.disabled = true;
+    shooterMotor2.disabled = true;
+    storageRoller.disabled = true;
   }
 
   @Override
   public void periodic() {
     shooterMotor1.update();
     shooterMotor2.update();
-    storageRoller.update();
+    // storageRoller.update();
   }
 
-  public Command toggleStorage() {
-    return run(() -> {
-      storageOn = !storageOn;
-      if (storageOn) {
-        storageRoller.setVelocity(Constants.StorageRoller.VELOCITY_RPS);
-      } else {
-        storageRoller.setVelocity(0);
-      }
-    });
-  }
+  // public Command toggleStorage() {
+  // return run(() -> {
+  // this.storageOn = !this.storageOn;
+  // if (this.storageOn) {
+  // storageRoller.setVelocity(Constants.StorageRoller.VELOCITY_RPS);
+  // } else {
+  // storageRoller.setVelocity(0);
+  // }
+  // });
+  // }
 
   public Command setState(boolean enabled) {
     return run(() -> {

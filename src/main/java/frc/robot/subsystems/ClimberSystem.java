@@ -11,7 +11,7 @@ import frc.robot.PIDMotor;
 
 public class ClimberSystem extends SubsystemBase {
     PIDMotor motor;
-    boolean extended;
+    boolean extended = false;
 
     @Override
     public void periodic() {
@@ -32,6 +32,9 @@ public class ClimberSystem extends SubsystemBase {
         mmconfigs.MotionMagicCruiseVelocity = Constants.Climber.MAX_VELOCITY_RPS;
 
         motor = PIDMotor.init(Constants.Climber.MOTOR_ID, configs, mmconfigs, 1.0, Constants.Climber.DIRECTION);
+        motor.disabled = true;
+
+        toggleClimbExtended();
     }
 
     public Command setClimbExtended(boolean extended) {
@@ -44,15 +47,13 @@ public class ClimberSystem extends SubsystemBase {
         });
     }
 
-    public Command toggleClimbExtended() {
-        return run(() -> {
-            extended = !extended;
+    public void toggleClimbExtended() {
+        extended = !extended;
 
-            if (extended) {
-                motor.set(Constants.Climber.ROTATIONS_PER_EXTENSION);
-            } else {
-                motor.set(0);
-            }
-        });
+        if (extended) {
+            motor.set(Constants.Climber.ROTATIONS_PER_EXTENSION);
+        } else {
+            motor.set(0);
+        }
     }
 }

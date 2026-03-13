@@ -11,8 +11,7 @@ import frc.robot.PIDMotor;
 public class IntakeSystem extends SubsystemBase {
   PIDMotor hingeMotor;
   PIDMotor intakeMotor;
-
-  IntakeState state;
+  boolean intakeUp;
 
   public IntakeSystem() {
     SlotConfigs configs = new SlotConfigs();
@@ -73,36 +72,13 @@ public class IntakeSystem extends SubsystemBase {
     });
   }
 
-  public enum IntakeState {
-    HOVERING,
-    RETRACTED,
-    DOWN
-  }
-
-  public Command toggleIntakeExtended() {
-    if (this.state == IntakeState.HOVERING) {
-      this.state = IntakeState.RETRACTED;
+  public void toggleIntakeExtended() {
+    intakeUp = !intakeUp;
+    System.out.println(intakeUp);
+    if (intakeUp) {
+      hingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
     } else {
-      this.state = IntakeState.HOVERING;
+      hingeMotor.set(0);
     }
-
-    return setIntakeExtended(this.state);
-  }
-
-  public Command setIntakeExtended(IntakeState state) {
-    return run(() -> {
-      System.out.println(state);
-      switch (state) {
-        case HOVERING:
-          hingeMotor.set(Constants.IntakeHinge.HOVER_SETPOINT_ROTATIONS);
-          break;
-        case RETRACTED:
-          hingeMotor.set(Constants.IntakeHinge.RETRACTED_SETPOINT_ROTATIONS);
-          break;
-        case DOWN:
-          hingeMotor.set(0);
-          break;
-      }
-    });
   }
 }
