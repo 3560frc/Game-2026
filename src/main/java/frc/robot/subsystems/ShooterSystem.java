@@ -10,8 +10,8 @@ import frc.robot.PIDMotor;
 public class ShooterSystem extends SubsystemBase {
   PIDMotor shooterMotor;
   public boolean reverseDirection;
-  public float speedScale = 1;
   public boolean shooting = true;
+  private double targetVelocity = 0;
 
   public ShooterSystem() {
     SlotConfigs configs = new SlotConfigs();
@@ -25,6 +25,8 @@ public class ShooterSystem extends SubsystemBase {
 
     shooterMotor = PIDMotor.init(Constants.ShooterRoller.MOTOR_ID, configs, mmconfigs, 1.0,
         Constants.ShooterRoller.DIRECTION);
+
+    resetShooterVelocity();
   }
 
   @Override
@@ -32,20 +34,22 @@ public class ShooterSystem extends SubsystemBase {
     shooterMotor.update();
   }
 
+  public void setShooterVelocity(double velocity) {
+    this.targetVelocity = velocity;
+  }
+
+  public void resetShooterVelocity() {
+    this.targetVelocity = Constants.ShooterRoller.VELOCITY_RPS;
+  }
+
   public void toggleShooter() {
     this.shooting = !this.shooting;
 
     if (this.shooting) {
-      // final int d = 210;
-      // final double RPM2 = 310 * Math.sqrt(Math.pow(d, 2) / (1.73 * d - 77));
-      // final double RPM1 = 1.78 * RPM2 / 2;
-      // shooterMotor1.setVelocity(RPM1 / 60);
-      // shooterMotor2.setVelocity(RPM2 / 60);
-
       if (!reverseDirection) {
-        shooterMotor.setVelocity(Constants.ShooterRoller.VELOCITY_RPS * speedScale);
+        shooterMotor.setVelocity(this.targetVelocity);
       } else {
-        shooterMotor.setVelocity(-Constants.ShooterRoller.VELOCITY_RPS * speedScale);
+        shooterMotor.setVelocity(-this.targetVelocity);
       }
     } else {
       shooterMotor.setVelocity(0);

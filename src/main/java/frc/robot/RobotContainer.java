@@ -26,18 +26,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ClimberSystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.IntakeSystem.IntakeDirection;
 import frc.robot.subsystems.ShooterSystem;
 
 public class RobotContainer {
-        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
-                                                                                      // top
-        private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 3/4 of a rotation per
-                                                                                         // second
-                                                                                         // max angular velocity
+        private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
+                                                                                            // top
+        private final double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 3/4 of a rotation per
+                                                                                               // second
+                                                                                               // max angular velocity
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -49,20 +48,29 @@ public class RobotContainer {
                                                                                               // motors
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+        private final SwerveRequest.RobotCentricFacingAngle face = new SwerveRequest.RobotCentricFacingAngle();
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
-        private final CommandXboxController joystick = new CommandXboxController(1);
+        private final CommandXboxController DriveController = new CommandXboxController(1);
+        private final CommandXboxController UtilsController = new CommandXboxController(0);
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
         // SubSystems
-        private final ClimberSystem climberSystem = new ClimberSystem();
         private final IntakeSystem intakeSystem = new IntakeSystem();
         private final ShooterSystem shooterSystem = new ShooterSystem();
 
         /* Path follower */
         private final SendableChooser<Command> autoChooser;
+
+        Pose2d HubCenter = new Pose2d(4.6304, 4.035, Rotation2d.fromDegrees(0));
+        Pose2d Outpost = new Pose2d(0.4093, 0.3605, Rotation2d.fromDegrees(0));
+        // Not sure
+        Pose2d RightTrench = new Pose2d(4.630371794871795, 7.61648717948718, Rotation2d.fromDegrees(0));
+        Pose2d LeftTrench = new Pose2d(4.630371794871795, 0.36048717948718034, Rotation2d.fromDegrees(0));
+
+        private Pose2d TrackingPoint = HubCenter;
 
         public RobotContainer() {
                 configureBindings();
@@ -87,71 +95,97 @@ public class RobotContainer {
                                 Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()));
         }
 
-        Pose2d HubCenter = new Pose2d(4.6304, 4.035, Rotation2d.fromDegrees(0));
-        Pose2d Outpost = new Pose2d(0.4093, 0.3605, Rotation2d.fromDegrees(0));
-        // Not sure
-        Pose2d RightTrench = new Pose2d(4.630371794871795, 7.61648717948718, Rotation2d.fromDegrees(0));
-        Pose2d LeftTrench = new Pose2d(4.630371794871795, 0.36048717948718034, Rotation2d.fromDegrees(0));
-
         // press button to correct pose
         private void resetPoseOnButton(Trigger trigger, Pose2d pose) {
                 trigger.onTrue(Commands.runOnce(() -> drivetrain.resetPose(pose)));
         }
 
+        class PointTrackData {
+                double distance;
+                Rotation2d targetRotation;
+                double shooterVelocity;
+        }
+
         // aimbot
-        private void trackCenter() {
-                Pose2d pose = drivetrain.getState().Pose;
+        private PointTrackData trackPointData(Pose2d point) {
+                Pose2d absolutePose = drivetrain.getState().Pose;
+                double deltax = absolutePose.getX() - point.getX();
+                double deltay = absolutePose.getY() - point.getY();
+                double d = Math.sqrt(Math.pow(deltax, 2) + Math.pow(deltay, 2));
+                double angleToTarget = Math.atan2(deltax, deltay);
+
+                final double RPM = 310 * Math.sqrt(Math.pow(d, 2) / (1.73 * d - 77));
+
+                PointTrackData data = new PointTrackData();
+                data.distance = d;
+                data.shooterVelocity = RPM;
+                data.targetRotation = Rotation2d.fromRadians(angleToTarget);
+                return data;
         }
 
         private void configureBindings() {
-                double xvalue = Math.pow(joystick.getLeftY(), 2);
-                double yvalue = Math.pow(joystick.getLeftX(), 2);
-                double rotation = Math.pow(joystick.getRightX(), 2);
-
-                drivetrain.setDefaultCommand(
-                                drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(xvalue * MaxSpeed)
-                                                .withVelocityY(yvalue * MaxSpeed)
-                                                .withRotationalRate(-rotation * MaxAngularRate)));
-
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
                 final var idle = new SwerveRequest.Idle();
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-                // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-                // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-                // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-                // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                // DriveController.back().and(DriveController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                // DriveController.back().and(DriveController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                // DriveController.start().and(DriveController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                // DriveController.start().and(DriveController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-                // Reset the field-centric heading on left bumper press.
-                joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
-                joystick.y().onTrue(Commands.runOnce(() -> climberSystem.toggleClimbExtended()));
-
-                joystick.x().onTrue(Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()));
-
-                joystick.leftTrigger()
+                DriveController.leftTrigger()
                                 .whileTrue(intakeSystem.setIntakeRollerEnabled(true, IntakeDirection.REVERSE))
                                 .whileFalse(intakeSystem.setIntakeRollerEnabled(false, IntakeDirection.STOP));
 
                 // Shooter Buttons
-                joystick.rightTrigger()
+                DriveController.rightTrigger()
                                 .onTrue(Commands.runOnce(() -> shooterSystem.toggleShooter()))
                                 .onFalse(Commands.runOnce(() -> shooterSystem.toggleShooter()));
 
-                joystick.povDown().onTrue(Commands.runOnce(() -> {
+                DriveController.povDown().onTrue(Commands.runOnce(() -> {
                         shooterSystem.reverseDirection = !shooterSystem.reverseDirection;
                 }));
 
-                joystick.povLeft().onTrue(Commands.runOnce(() -> {
-                        shooterSystem.speedScale -= 0.05;
+                // enable tracking
+                DriveController.rightBumper().onTrue(Commands.runOnce(() -> {
+                        PointTrackData data = trackPointData(TrackingPoint);
+                        shooterSystem.setShooterVelocity(data.shooterVelocity);
+                        shooterSystem.toggleShooter();
+
+                        drivetrain.setControl(face);
+
+                        drivetrain.setDefaultCommand(drivetrain.applyRequest(() -> {
+                                double xvalue = Math.pow(DriveController.getLeftX(), 2);
+                                double yvalue = Math.pow(DriveController.getLeftY(), 2);
+
+                                return face.withVelocityX(xvalue * MaxSpeed)
+                                                .withVelocityY(yvalue * MaxSpeed)
+                                                .withTargetDirection(data.targetRotation);
+                        }));
+                })).onFalse(Commands.runOnce(() -> {
+                        shooterSystem.resetShooterVelocity();
+                        shooterSystem.toggleShooter();
+
+                        drivetrain.setControl(drive);
+
+                        drivetrain.setDefaultCommand(drivetrain.applyRequest(() -> {
+                                double xvalue = Math.pow(DriveController.getLeftX(), 2);
+                                double yvalue = Math.pow(DriveController.getLeftY(), 2);
+                                double rotation = Math.pow(DriveController.getRightX(), 2);
+
+                                return drive.withVelocityX(xvalue * MaxSpeed)
+                                                .withVelocityY(yvalue * MaxSpeed)
+                                                .withRotationalRate(-rotation * MaxAngularRate);
+                        }));
                 }));
 
-                joystick.povRight().onTrue(Commands.runOnce(() -> {
-                        shooterSystem.speedScale += 0.05;
-                }));
+                // Utils
+                DriveController.povUp().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+                resetPoseOnButton(UtilsController.povDown(), Outpost);
+                resetPoseOnButton(UtilsController.povRight(), RightTrench);
+                resetPoseOnButton(UtilsController.povLeft(), LeftTrench);
 
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
