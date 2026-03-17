@@ -50,6 +50,8 @@ public class ClimberSystem extends SubsystemBase {
     public void toggleClimbExtended() {
         extended = !extended;
 
+        System.out.println(extended);
+
         if (extended) {
             motor.set(Constants.Climber.ROTATIONS_PER_EXTENSION);
         } else {

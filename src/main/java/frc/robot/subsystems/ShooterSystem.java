@@ -40,7 +40,7 @@ public class ShooterSystem extends SubsystemBase {
     shooterMotor1 = PIDMotor.init(Constants.ShooterRoller.MOTOR_ID, configs1, mmconfigs1, 1.0,
         Constants.ShooterRoller.DIRECTION);
 
-    // shooterMotor2.disabled = true;
+    shooterMotor2.disabled = true;
   }
 
   @Override
@@ -51,7 +51,6 @@ public class ShooterSystem extends SubsystemBase {
 
   public void toggleTop() {
     topEnabled = !topEnabled;
-
     System.out.println(topEnabled);
 
     if (topEnabled) {
@@ -63,6 +62,20 @@ public class ShooterSystem extends SubsystemBase {
     } else {
       shooterMotor2.setVelocity(0);
     }
+  }
+
+  public Command setStateTop(boolean enabled) {
+    return run(() -> {
+      if (enabled) {
+        if (!reverseDirection) {
+          shooterMotor2.setVelocity(Constants.ShooterTop.VELOCITY_RPS * speedScale);
+        } else {
+          shooterMotor2.setVelocity(-Constants.ShooterTop.VELOCITY_RPS * speedScale);
+        }
+      } else {
+        shooterMotor2.setVelocity(0);
+      }
+    });
   }
 
   public Command setState(boolean enabled) {

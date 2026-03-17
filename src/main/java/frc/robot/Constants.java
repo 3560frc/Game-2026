@@ -11,9 +11,9 @@ public class Constants {
         public static final double kG = 0;
         public static final double kS = 0;
         public static final double GEAR_RATIO = 1.0;
-        public static final double MAX_VELOCITY_RPS = 360;
-        public static final double MAX_ACCELERATION_RPSPS = 120;
-        public static final double ROTATIONS_PER_EXTENSION = 200; // estimate
+        public static final double MAX_VELOCITY_RPS = 20;
+        public static final double MAX_ACCELERATION_RPSPS = 10;
+        public static final double ROTATIONS_PER_EXTENSION = 50; // estimate
         public static final InvertedValue DIRECTION = InvertedValue.CounterClockwise_Positive;
     }
 
@@ -36,9 +36,9 @@ public class Constants {
         public static final double kP = 0.015;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 65; // estimate
-        public static final double MAX_VELOCITY_RPS = 65;
-        public static final double MAX_ACCELERATION_RPSPS = 1500;
+        public static final double VELOCITY_RPS = 77; // estimate
+        public static final double MAX_VELOCITY_RPS = 77;
+        public static final double MAX_ACCELERATION_RPSPS = 600;
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
@@ -58,9 +58,11 @@ public class Constants {
         public static final double kP = 0.06;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 10;
-        public static final double MAX_VELOCITY_RPS = 10;
-        public static final double MAX_ACCELERATION_RPSPS = 150;
+        // public static final double VELOCITY_RPS = 10;
+        // public static final double MAX_VELOCITY_RPS = 10;
+        public static final double VELOCITY_RPS = 67;
+        public static final double MAX_VELOCITY_RPS = 67;
+        public static final double MAX_ACCELERATION_RPSPS = 600;
         // The VELOCITY_RPS was 75 WE ARE NOW CHANGING IT FOR TESTING TO 40, THANKS -
         // AIDEN M, YUVRAJ G & AAYUSH K
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
