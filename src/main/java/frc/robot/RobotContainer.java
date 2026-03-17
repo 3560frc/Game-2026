@@ -16,6 +16,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -85,21 +87,18 @@ public class RobotContainer {
                                 Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()));
         }
 
-        Pose2d HubCenter = new Pose2d(4.6304, 4.035, null);
-        Pose2d Outpost = new Pose2d(0.4093, 0.3605, null);
+        Pose2d HubCenter = new Pose2d(4.6304, 4.035, Rotation2d.fromDegrees(0));
+        Pose2d Outpost = new Pose2d(0.4093, 0.3605, Rotation2d.fromDegrees(0));
         // Not sure
-        Pose2d RightTrench = new Pose2d(4.630371794871795, 7.61648717948718, null);
-        Pose2d LeftTrench = new Pose2d(4.630371794871795, 0.36048717948718034, null);
+        Pose2d RightTrench = new Pose2d(4.630371794871795, 7.61648717948718, Rotation2d.fromDegrees(0));
+        Pose2d LeftTrench = new Pose2d(4.630371794871795, 0.36048717948718034, Rotation2d.fromDegrees(0));
 
-        // press button to correct pose when you push push the balls in the corner for
-        // aimbot
-        private void resetPoseOutpost() {
-                Pose2d pose = drivetrain.getState().Pose;
-                joystick.leftBumper().onTrue(
-                                Commands.runOnce(() -> drivetrain.resetPose(
-                                                new Pose2d(Outpost.getX(), Outpost.getY(), pose.getRotation()))));
+        // press button to correct pose
+        private void resetPoseOnButton(Trigger trigger, Pose2d pose) {
+                trigger.onTrue(Commands.runOnce(() -> drivetrain.resetPose(pose)));
         }
 
+        // aimbot
         private void trackCenter() {
                 Pose2d pose = drivetrain.getState().Pose;
         }
