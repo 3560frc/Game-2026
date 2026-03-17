@@ -21,7 +21,7 @@ public class Constants {
         public static final int MOTOR_ID = 44;
         public static final double kP = 50;
         public static final double kI = 0;
-        public static final double kD = 0;// Arm offset 0.06
+        public static final double kD = 0; // Arm offset 0.06
         public static final double kG = 0;
         public static final double kS = 0;
         public static final double GEAR_RATIO = 1.0;

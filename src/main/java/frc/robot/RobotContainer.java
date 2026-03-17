@@ -15,6 +15,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,9 +29,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.IntakeSystem.IntakeDirection;
 import frc.robot.subsystems.ShooterSystem;
-// Jittering when goes fast
-// Toggles don't work
-// Climb doesn't work
 
 public class RobotContainer {
         private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
@@ -69,56 +67,53 @@ public class RobotContainer {
                 registerCommands();
 
                 // Warmup PathPlanner to avoid Java pauses
-                autoChooser = AutoBuilder.buildAutoChooser("bananaAuto");
+                autoChooser = AutoBuilder.buildAutoChooser("BackShots");
                 SmartDashboard.putData("Auto Mode", autoChooser);
                 CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
         }
 
         // Pathplanner needs this to know how to call stuff
         private void registerCommands() {
-                NamedCommands.registerCommand("EnableShoot", shooterSystem.setState(true));
-                NamedCommands.registerCommand("DisabledShoot", shooterSystem.setState(false));
-                // Intake
-                NamedCommands.registerCommand("EnableIntake",
-                                intakeSystem.setIntakeRollerEnabled(true, IntakeDirection.REVERSE));
-                NamedCommands.registerCommand("DisableIntake",
-                                intakeSystem.setIntakeRollerEnabled(true, IntakeDirection.STOP));
-                // NamedCommands.registerCommand("disable_intake_rollers",
-                // intakeSystem.setIntakeRollerEnabled(false));
-                // NamedCommands.registerCommand("extend_intake",
-                // intakeSystem.setIntakeExtended(true));
-                // NamedCommands.registerCommand("retract_intake",
-                // intakeSystem.setIntakeExtended(false));
+                NamedCommands.registerCommand(
+                                "Shoot",
+                                Commands.runOnce(() -> shooterSystem.toggleShooter()));
+                NamedCommands.registerCommand(
+                                "StopShoot",
+                                Commands.runOnce(() -> shooterSystem.toggleShooter()));
+                NamedCommands.registerCommand(
+                                "ToggleIntake",
+                                Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()));
+        }
 
-                // // Shooter
-                // NamedCommands.registerCommand("enable_shooter_rollers",
-                // shooterSystem.setState(true));
-                // NamedCommands.registerCommand("disable_shooter_rollers",
-                // shooterSystem.setState(false));
+        Pose2d HubCenter = new Pose2d(4.6304, 4.035, null);
+        Pose2d Outpost = new Pose2d(0.4093, 0.3605, null);
+        // Not sure
+        Pose2d RightTrench = new Pose2d(4.630371794871795, 7.61648717948718, null);
+        Pose2d LeftTrench = new Pose2d(4.630371794871795, 0.36048717948718034, null);
 
-                // // Climber
-                // NamedCommands.registerCommand("extend_climber",
-                // climberSystem.setClimbExtended(true));
-                // NamedCommands.registerCommand("retract_climber",
-                // climberSystem.setClimbExtended(false));
+        // press button to correct pose when you push push the balls in the corner for
+        // aimbot
+        private void resetPoseOutpost() {
+                Pose2d pose = drivetrain.getState().Pose;
+                joystick.leftBumper().onTrue(
+                                Commands.runOnce(() -> drivetrain.resetPose(
+                                                new Pose2d(Outpost.getX(), Outpost.getY(), pose.getRotation()))));
+        }
 
-                NamedCommands.registerCommand("Shoot", shooterSystem.setState(true));
+        private void trackCenter() {
+                Pose2d pose = drivetrain.getState().Pose;
         }
 
         private void configureBindings() {
-                // inverted these
+                double xvalue = Math.pow(joystick.getLeftY(), 2);
+                double yvalue = Math.pow(joystick.getLeftX(), 2);
+                double rotation = Math.pow(joystick.getRightX(), 2);
+
                 drivetrain.setDefaultCommand(
                                 drivetrain.applyRequest(() -> drive
-                                                .withVelocityX(joystick.getLeftY() *
-                                                                MaxSpeed) // Drive
-                                                .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with
-                                                // negative X (left)
-                                                .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive
-                                // counterclockwise
-                                // with
-                                // negative
-                                // X (left)
-                                ));
+                                                .withVelocityX(xvalue * MaxSpeed)
+                                                .withVelocityY(yvalue * MaxSpeed)
+                                                .withRotationalRate(-rotation * MaxAngularRate)));
 
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
@@ -126,8 +121,6 @@ public class RobotContainer {
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-                //// Run SysId routines when holding back/start and X/Y.
-                //// Note that each routine should be run exactly once in a single log.
                 // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
                 // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
                 // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
@@ -146,8 +139,8 @@ public class RobotContainer {
 
                 // Shooter Buttons
                 joystick.rightTrigger()
-                                .whileTrue(shooterSystem.setState(true))
-                                .whileFalse(shooterSystem.setState(false));
+                                .onTrue(Commands.runOnce(() -> shooterSystem.toggleShooter()))
+                                .onFalse(Commands.runOnce(() -> shooterSystem.toggleShooter()));
 
                 joystick.povDown().onTrue(Commands.runOnce(() -> {
                         shooterSystem.reverseDirection = !shooterSystem.reverseDirection;
@@ -161,18 +154,11 @@ public class RobotContainer {
                         shooterSystem.speedScale += 0.05;
                 }));
 
-                // joystick.b()
-                //// .onTrue(Commands.runOnce(() -> {
-                //// shooterSystem.toggleTop();
-                //// }));
-                // .whileTrue(shooterSystem.setStateTop(true))
-                // .whileFalse(shooterSystem.setStateTop(false));
                 drivetrain.registerTelemetry(logger::telemeterize);
         }
 
         public Command getAutonomousCommand() {
                 // chooses the auto from GUI
                 return autoChooser.getSelected();
-                // return null;
         }
 }
