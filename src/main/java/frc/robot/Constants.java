@@ -18,7 +18,9 @@ public class Constants {
     }
 
     public class IntakeHinge {
-        public static final int MOTOR_ID = 44;
+        // needs reconfiguration for IDs at least
+        public static final int MOTOR_ID_LEFT = 44;
+        public static final int MOTOR_ID_RIGHT = 44;
         public static final double kP = 50;
         public static final double kI = 0;
         public static final double kD = 0; // Arm offset 0.06

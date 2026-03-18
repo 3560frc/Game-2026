@@ -3,49 +3,64 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PIDMotor;
 
 public class IntakeSystem extends SubsystemBase {
-  PIDMotor hingeMotor;
+  PIDMotor leftHingeMotor;
+  PIDMotor rightHingeMotor;
   PIDMotor intakeMotor;
   boolean intakeUp;
   boolean intakeRollersEnabled;
 
   public IntakeSystem() {
     SlotConfigs configs = new SlotConfigs();
-    configs.kP = Constants.IntakeHinge.kP;
-    configs.kI = Constants.IntakeHinge.kI;
-    configs.kD = Constants.IntakeHinge.kD;
-    configs.kG = Constants.IntakeHinge.kG;
-    configs.kS = Constants.IntakeHinge.kS;
+    configs.kP = Constants.IntakeRoller.kP;
+    configs.kI = Constants.IntakeRoller.kI;
+    configs.kD = Constants.IntakeRoller.kD;
 
     MotionMagicConfigs mmconfigs = new MotionMagicConfigs();
-    mmconfigs.MotionMagicAcceleration = Constants.IntakeHinge.MAX_ACCELERATION_RPSPS;
-    mmconfigs.MotionMagicCruiseVelocity = Constants.IntakeHinge.MAX_VELOCITY_RPS;
+    mmconfigs.MotionMagicAcceleration = Constants.IntakeRoller.MAX_ACCELERATION_RPSPS;
+    mmconfigs.MotionMagicCruiseVelocity = Constants.IntakeRoller.MAX_VELOCITY_RPS;
 
-    hingeMotor = PIDMotor.init(Constants.IntakeHinge.MOTOR_ID, configs, mmconfigs, 1.0,
+    intakeMotor = PIDMotor.init(Constants.IntakeRoller.MOTOR_ID, configs, mmconfigs, 1.0,
+        Constants.IntakeRoller.DIRECTION);
+
+    SlotConfigs left_configs = new SlotConfigs();
+    left_configs.kP = Constants.IntakeHinge.kP;
+    left_configs.kI = Constants.IntakeHinge.kI;
+    left_configs.kD = Constants.IntakeHinge.kD;
+    left_configs.kG = Constants.IntakeHinge.kG;
+    left_configs.kS = Constants.IntakeHinge.kS;
+
+    MotionMagicConfigs mmleft_configs = new MotionMagicConfigs();
+    mmleft_configs.MotionMagicAcceleration = Constants.IntakeHinge.MAX_ACCELERATION_RPSPS;
+    mmleft_configs.MotionMagicCruiseVelocity = Constants.IntakeHinge.MAX_VELOCITY_RPS;
+
+    leftHingeMotor = PIDMotor.init(Constants.IntakeHinge.MOTOR_ID_LEFT, left_configs, mmleft_configs, 1.0,
         Constants.IntakeHinge.DIRECTION);
 
-    SlotConfigs configs1 = new SlotConfigs();
-    configs1.kP = Constants.IntakeRoller.kP;
-    configs1.kI = Constants.IntakeRoller.kI;
-    configs1.kD = Constants.IntakeRoller.kD;
+    SlotConfigs right_configs = new SlotConfigs();
+    right_configs.kP = Constants.IntakeHinge.kP;
+    right_configs.kI = Constants.IntakeHinge.kI;
+    right_configs.kD = Constants.IntakeHinge.kD;
+    right_configs.kG = Constants.IntakeHinge.kG;
+    right_configs.kS = Constants.IntakeHinge.kS;
 
-    MotionMagicConfigs mmconfigs1 = new MotionMagicConfigs();
-    mmconfigs1.MotionMagicAcceleration = Constants.IntakeRoller.MAX_ACCELERATION_RPSPS;
-    mmconfigs1.MotionMagicCruiseVelocity = Constants.IntakeRoller.MAX_VELOCITY_RPS;
+    MotionMagicConfigs mmright_configs = new MotionMagicConfigs();
+    mmright_configs.MotionMagicAcceleration = Constants.IntakeHinge.MAX_ACCELERATION_RPSPS;
+    mmright_configs.MotionMagicCruiseVelocity = Constants.IntakeHinge.MAX_VELOCITY_RPS;
 
-    intakeMotor = PIDMotor.init(Constants.IntakeRoller.MOTOR_ID, configs1, mmconfigs1, 1.0,
-        Constants.IntakeRoller.DIRECTION);
+    rightHingeMotor = PIDMotor.init(Constants.IntakeHinge.MOTOR_ID_RIGHT, right_configs, mmright_configs, 1.0,
+        Constants.IntakeHinge.DIRECTION);
   }
 
   @Override
   public void periodic() {
     intakeMotor.update();
-    hingeMotor.update();
+    leftHingeMotor.update();
+    rightHingeMotor.update();
   }
 
   public void toggleIntakeRollers() {
@@ -62,9 +77,11 @@ public class IntakeSystem extends SubsystemBase {
     intakeUp = !intakeUp;
     System.out.println(intakeUp);
     if (intakeUp) {
-      hingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+      leftHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+      rightHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
     } else {
-      hingeMotor.stop();
+      rightHingeMotor.stop();
+      leftHingeMotor.stop();
     }
   }
 }
