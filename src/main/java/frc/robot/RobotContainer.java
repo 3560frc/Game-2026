@@ -28,8 +28,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSystem;
-import frc.robot.subsystems.IntakeSystem.IntakeDirection;
 import frc.robot.subsystems.ShooterSystem;
+import frc.robot.subsystems.StorageSystem;
 
 public class RobotContainer {
         private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired
@@ -60,6 +60,7 @@ public class RobotContainer {
         // SubSystems
         private final IntakeSystem intakeSystem = new IntakeSystem();
         private final ShooterSystem shooterSystem = new ShooterSystem();
+        private final StorageSystem storageSystem = new StorageSystem();
 
         /* Path follower */
         private final SendableChooser<Command> autoChooser;
@@ -92,7 +93,10 @@ public class RobotContainer {
                                 Commands.runOnce(() -> shooterSystem.toggleShooter()));
                 NamedCommands.registerCommand(
                                 "ToggleIntake",
-                                Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()));
+                                Commands.runOnce(() -> {
+                                        storageSystem.toggleStorage();
+                                        intakeSystem.toggleIntakeRollers();
+                                }));
         }
 
         // press button to correct pose
@@ -123,33 +127,37 @@ public class RobotContainer {
                 return data;
         }
 
-        private void configureBindings() {
+        private void configureDriveBindings() {
+                // IDK
+                // DriveController.back().and(DriveController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                // DriveController.back().and(DriveController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                // DriveController.start().and(DriveController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                // DriveController.start().and(DriveController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
                 // Idle while the robot is disabled. This ensures the configured
                 // neutral mode is applied to the drive motors while disabled.
                 final var idle = new SwerveRequest.Idle();
                 RobotModeTriggers.disabled().whileTrue(
                                 drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-                // DriveController.back().and(DriveController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-                // DriveController.back().and(DriveController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-                // DriveController.start().and(DriveController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-                // DriveController.start().and(DriveController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                DriveController.rightTrigger()
+                                .onTrue(Commands.runOnce(() -> intakeSystem.toggleIntakeRollers()))
+                                .onFalse(Commands.runOnce(() -> intakeSystem.toggleIntakeRollers()));
 
                 DriveController.leftTrigger()
-                                .whileTrue(intakeSystem.setIntakeRollerEnabled(true, IntakeDirection.REVERSE))
-                                .whileFalse(intakeSystem.setIntakeRollerEnabled(false, IntakeDirection.STOP));
+                                .onTrue(Commands.runOnce(() -> storageSystem.toggleStorage()))
+                                .onFalse(Commands.runOnce(() -> storageSystem.toggleStorage()));
 
-                // Shooter Buttons
-                DriveController.rightTrigger()
-                                .onTrue(Commands.runOnce(() -> shooterSystem.toggleShooter()))
-                                .onFalse(Commands.runOnce(() -> shooterSystem.toggleShooter()));
+                DriveController.x()
+                                .onTrue(Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()))
+                                .onFalse(Commands.runOnce(() -> intakeSystem.toggleIntakeExtended()));
+        }
 
-                DriveController.povDown().onTrue(Commands.runOnce(() -> {
-                        shooterSystem.reverseDirection = !shooterSystem.reverseDirection;
-                }));
+        private void configureBindings() {
+                configureDriveBindings();
 
-                // enable tracking
-                DriveController.rightBumper().onTrue(Commands.runOnce(() -> {
+                // Tracked Shooting
+                UtilsController.rightBumper().onTrue(Commands.runOnce(() -> {
                         PointTrackData data = trackPointData(TrackingPoint);
                         shooterSystem.setShooterVelocity(data.shooterVelocity);
                         shooterSystem.toggleShooter();
@@ -181,8 +189,20 @@ public class RobotContainer {
                         }));
                 }));
 
-                // Utils
-                DriveController.povUp().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+                // Ordinary Shooting
+                UtilsController.rightTrigger()
+                                .whileTrue(Commands.run(() -> shooterSystem
+                                                .setShooterVelocity(Constants.ShooterRoller.VELOCITY_RPS
+                                                                * DriveController.getRightTriggerAxis())))
+                                .onTrue(Commands.runOnce(() -> shooterSystem.toggleShooter()))
+                                .onFalse(Commands.runOnce(() -> shooterSystem.toggleShooter()));
+
+                DriveController.povDown().onTrue(Commands.runOnce(() -> {
+                        shooterSystem.reverseDirection = !shooterSystem.reverseDirection;
+                }));
+
+                // Update Field Position
+                UtilsController.povUp().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
                 resetPoseOnButton(UtilsController.povDown(), Outpost);
                 resetPoseOnButton(UtilsController.povRight(), RightTrench);
                 resetPoseOnButton(UtilsController.povLeft(), LeftTrench);

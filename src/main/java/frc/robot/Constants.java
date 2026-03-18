@@ -42,7 +42,8 @@ public class Constants {
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
-    public class ShooterTop {
+    public class ShooterFeed {
+        // needs reconfiguration
         public static final int MOTOR_ID = 60;
         public static final double kP = 0.032;
         public static final double kI = 0;
@@ -68,8 +69,10 @@ public class Constants {
         public static final InvertedValue DIRECTION = InvertedValue.Clockwise_Positive;
     }
 
-    public class StorageRoller {
-        public static final int MOTOR_ID = 15;
+    public class StorageRollers {
+        // Needs reconfiguration
+        public static final int MOTOR_ID_LEFT = 15;
+        public static final int MOTOR_ID_RIGHT = 15;
         public static final double kP = 0.032;
         public static final double kI = 0;
         public static final double kD = 0;

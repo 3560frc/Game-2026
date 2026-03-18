@@ -12,6 +12,7 @@ public class IntakeSystem extends SubsystemBase {
   PIDMotor hingeMotor;
   PIDMotor intakeMotor;
   boolean intakeUp;
+  boolean intakeRollersEnabled;
 
   public IntakeSystem() {
     SlotConfigs configs = new SlotConfigs();
@@ -41,35 +42,20 @@ public class IntakeSystem extends SubsystemBase {
         Constants.IntakeRoller.DIRECTION);
   }
 
-  public enum IntakeDirection {
-    FORWARD,
-    REVERSE,
-    STOP
-  }
-
   @Override
   public void periodic() {
     intakeMotor.update();
     hingeMotor.update();
   }
 
-  public Command setIntakeRollerEnabled(boolean enabled, IntakeDirection direction) {
-    return run(() -> {
-      System.out.println(direction);
-      System.out.println(enabled);
+  public void toggleIntakeRollers() {
+    intakeRollersEnabled = !intakeRollersEnabled;
 
-      if (enabled) {
-        if (direction == IntakeDirection.FORWARD) {
-          intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
-        }
-
-        if (direction == IntakeDirection.REVERSE) {
-          intakeMotor.setVelocity(-Constants.IntakeRoller.VELOCITY_RPS);
-        }
-      } else {
-        intakeMotor.setVelocity(0);
-      }
-    });
+    if (intakeRollersEnabled) {
+      intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
+    } else {
+      intakeMotor.setVelocity(0);
+    }
   }
 
   public void toggleIntakeExtended() {

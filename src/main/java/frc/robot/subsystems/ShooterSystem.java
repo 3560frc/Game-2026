@@ -8,30 +8,43 @@ import frc.robot.Constants;
 import frc.robot.PIDMotor;
 
 public class ShooterSystem extends SubsystemBase {
-  PIDMotor shooterMotor;
-  public boolean reverseDirection;
-  public boolean shooting = true;
-  private double targetVelocity = 0;
+  PIDMotor shooterRoller;
+  PIDMotor shooterFeed;
+  public boolean reverseDirection = false;
+  public boolean shooting = false;
+  public boolean feeding = false;
+  private double targetVelocity = Constants.ShooterRoller.VELOCITY_RPS;
 
   public ShooterSystem() {
-    SlotConfigs configs = new SlotConfigs();
-    configs.kP = Constants.ShooterRoller.kP;
-    configs.kI = Constants.ShooterRoller.kI;
-    configs.kD = Constants.ShooterRoller.kD;
+    SlotConfigs rollerconfigs = new SlotConfigs();
+    rollerconfigs.kP = Constants.ShooterRoller.kP;
+    rollerconfigs.kI = Constants.ShooterRoller.kI;
+    rollerconfigs.kD = Constants.ShooterRoller.kD;
 
-    MotionMagicConfigs mmconfigs = new MotionMagicConfigs();
-    mmconfigs.MotionMagicAcceleration = Constants.ShooterRoller.MAX_ACCELERATION_RPSPS;
-    mmconfigs.MotionMagicCruiseVelocity = Constants.ShooterRoller.MAX_VELOCITY_RPS;
+    MotionMagicConfigs mmrollerconfigs = new MotionMagicConfigs();
+    mmrollerconfigs.MotionMagicAcceleration = Constants.ShooterRoller.MAX_ACCELERATION_RPSPS;
+    mmrollerconfigs.MotionMagicCruiseVelocity = Constants.ShooterRoller.MAX_VELOCITY_RPS;
 
-    shooterMotor = PIDMotor.init(Constants.ShooterRoller.MOTOR_ID, configs, mmconfigs, 1.0,
+    shooterRoller = PIDMotor.init(Constants.ShooterRoller.MOTOR_ID, rollerconfigs, mmrollerconfigs, 1.0,
         Constants.ShooterRoller.DIRECTION);
 
-    resetShooterVelocity();
+    SlotConfigs feedconfigs = new SlotConfigs();
+    feedconfigs.kP = Constants.ShooterFeed.kP;
+    feedconfigs.kI = Constants.ShooterFeed.kI;
+    feedconfigs.kD = Constants.ShooterFeed.kD;
+
+    MotionMagicConfigs mmfeedconfigs = new MotionMagicConfigs();
+    mmfeedconfigs.MotionMagicAcceleration = Constants.ShooterFeed.MAX_ACCELERATION_RPSPS;
+    mmfeedconfigs.MotionMagicCruiseVelocity = Constants.ShooterFeed.MAX_VELOCITY_RPS;
+
+    shooterRoller = PIDMotor.init(Constants.ShooterFeed.MOTOR_ID, feedconfigs, mmfeedconfigs, 1.0,
+        Constants.ShooterFeed.DIRECTION);
   }
 
   @Override
   public void periodic() {
-    shooterMotor.update();
+    shooterRoller.update();
+    shooterFeed.update();
   }
 
   public void setShooterVelocity(double velocity) {
@@ -42,17 +55,31 @@ public class ShooterSystem extends SubsystemBase {
     this.targetVelocity = Constants.ShooterRoller.VELOCITY_RPS;
   }
 
+  public void toggleFeed() {
+    this.feeding = !this.feeding;
+
+    if (this.feeding) {
+      if (!reverseDirection) {
+        shooterFeed.setVelocity(Constants.ShooterFeed.VELOCITY_RPS);
+      } else {
+        shooterFeed.setVelocity(-Constants.ShooterFeed.VELOCITY_RPS);
+      }
+    } else {
+      shooterFeed.setVelocity(0);
+    }
+  }
+
   public void toggleShooter() {
     this.shooting = !this.shooting;
 
     if (this.shooting) {
       if (!reverseDirection) {
-        shooterMotor.setVelocity(this.targetVelocity);
+        shooterRoller.setVelocity(this.targetVelocity);
       } else {
-        shooterMotor.setVelocity(-this.targetVelocity);
+        shooterRoller.setVelocity(-this.targetVelocity);
       }
     } else {
-      shooterMotor.setVelocity(0);
+      shooterRoller.setVelocity(0);
     }
   }
 }
