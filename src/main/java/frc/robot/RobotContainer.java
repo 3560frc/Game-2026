@@ -60,7 +60,8 @@ public class RobotContainer {
   private final ShooterSystem shooterSystem = new ShooterSystem();
   // private final StorageSystem storageSystem = new StorageSystem();
 
-  // SG: see https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/RobotContainer.java
+  // SG: see
+  // https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/RobotContainer.java
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -76,24 +77,20 @@ public class RobotContainer {
 
   // SG: Pathplanner needs this to know how to call stuff
   private void registerCommands() {
-    NamedCommands.registerCommand(
-        "PreShoot",
+    NamedCommands.registerCommand("PreShoot",
         Commands.runOnce(() -> {
           shooterSystem.toggleShooter();
         }));
-    NamedCommands.registerCommand(
-        "Shoot",
+    NamedCommands.registerCommand("Shoot",
         Commands.runOnce(() -> {
           shooterSystem.toggleFeed();
         }));
-    NamedCommands.registerCommand(
-        "StopShoot",
+    NamedCommands.registerCommand("StopShoot",
         Commands.runOnce(() -> {
           shooterSystem.toggleShooter();
           shooterSystem.toggleFeed();
         }));
-    NamedCommands.registerCommand(
-        "ToggleIntake",
+    NamedCommands.registerCommand("ToggleIntake",
         Commands.runOnce(() -> {
           // storageSystem.toggleStorage();
           intakeSystem.toggleIntakeRollers();
@@ -104,7 +101,7 @@ public class RobotContainer {
   private void resetPoseOnButton(Trigger trigger, Pose2d pose) {
     trigger.onTrue(Commands.runOnce(() -> drivetrain.resetPose(pose)));
   }
-  
+
   Pose2d HubCenter = new Pose2d(4.6304, 4.035, Rotation2d.fromDegrees(0));
   Pose2d Outpost = new Pose2d(0.4093, 0.3605, Rotation2d.fromDegrees(0));
   // Not sure
@@ -179,87 +176,61 @@ public class RobotContainer {
     // SlewRateLimiter r = new SlewRateLimiter(0.85);
 
     // SG: if backwards is forwards and forwards is backwards flip the controls
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-            () -> {
-              return drive
-                  .withVelocityX(-y.calculate(DriveController.getLeftY()) * MaxSpeed)
-                  .withVelocityY(-x.calculate(DriveController.getLeftX()) * MaxSpeed)
-                  .withRotationalRate(DriveController.getRightX() * MaxAngularRate);
-            }));
+    UtilsController.rightBumper().toggleOnTrue(Commands.runOnce(() -> {
+      PointTrackData data = trackPointData(TrackingPoint);
+      shooterSystem.setShooterVelocity(data.shooterVelocity);
+      shooterSystem.toggleShooter();
 
-    // drivetrain.setDefaultCommand(
-    // drivetrain.applyRequest(
-    // () -> {
-    // double lefty = DriveController.getLeftY();
-    // double leftx = DriveController.getLeftX();
-    // double rightx = DriveController.getRightX();
+      System.out.println("tracking");
 
-    // System.out.println(leftx);
+      drivetrain.setControl(face);
 
-    // return drive.withVelocityX(-StrictMath.pow(lefty, 3) * MaxSpeed)
-    // .withVelocityY(-StrictMath.pow(leftx, 3)
-    // * MaxSpeed)
-    // .withRotationalRate(-StrictMath.pow(rightx, 3)
-    // * MaxAngularRate);
-    // }));
+      drivetrain.setDefaultCommand(
+          drivetrain.applyRequest(
+              () -> {
+                return face
+                    .withTargetDirection(data.targetRotation)
+                    .withVelocityX(-y.calculate(DriveController.getLeftY()) * MaxSpeed)
+                    .withVelocityY(-x.calculate(DriveController.getLeftX()) * MaxSpeed);
+              }));
+    })).toggleOnFalse(Commands.runOnce(() -> {
+      shooterSystem.resetShooterVelocity();
+      shooterSystem.toggleShooter();
 
-    // UtilsController.rightBumper().toggleOnTrue(Commands.runOnce(() -> {
-    // PointTrackData data = trackPointData(TrackingPoint);
-    // shooterSystem.setShooterVelocity(data.shooterVelocity);
-    // shooterSystem.toggleShooter();
+      System.out.println("drive");
 
-    // drivetrain.setControl(face);
+      drivetrain.setControl(drive);
 
-    // drivetrain.setDefaultCommand(drivetrain.applyRequest(() -> {
-    // double xvalue = Math.pow(DriveController.getLeftX(), 2);
-    // double yvalue = Math.pow(DriveController.getLeftY(), 2);
+      drivetrain.setDefaultCommand(
+          drivetrain.applyRequest(
+              () -> {
+                return drive
+                    .withVelocityX(-y.calculate(DriveController.getLeftY()) * MaxSpeed)
+                    .withVelocityY(-x.calculate(DriveController.getLeftX()) * MaxSpeed)
+                    .withRotationalRate(DriveController.getRightX() * MaxAngularRate);
+              }));
+    }));
 
-    // return face.withVelocityX(-xvalue * MaxSpeed)
-    // .withVelocityY(-yvalue * MaxSpeed)
-    // .withTargetDirection(data.targetRotation);
-    // }));
-    // })).toggleOnFalse(Commands.runOnce(() -> {
-    // shooterSystem.resetShooterVelocity();
-    // shooterSystem.toggleShooter();
-
-    // drivetrain.setControl(drive);
-
-    // drivetrain.setDefaultCommand(drivetrain.applyRequest(() -> {
-    // double xvalue = Math.pow(DriveController.getLeftX(), 2);
-    // double yvalue = Math.pow(DriveController.getLeftY(), 2);
-    // double rotation = Math.pow(DriveController.getRightX(), 2);
-
-    // return drive.withVelocityX(-xvalue * MaxSpeed)
-    // .withVelocityY(-yvalue * MaxSpeed)
-    // .withRotationalRate(rotation * MaxAngularRate);
-    // }));
-    // }));
-
-    // Ordinary Shooting
+    // SG: Ordinary Shooting
     UtilsController.rightTrigger()
-        // .whileTrue(Commands.run(() -> shooterSystem
-        // .activateShooterWithSpeed(DriveController.getRightTriggerAxis())));
         .onTrue(Commands.runOnce(() -> shooterSystem.toggleShooter()))
         .onFalse(Commands.runOnce(() -> shooterSystem.toggleShooter()));
 
     UtilsController.leftTrigger()
-        // .whileTrue(Commands.run(() -> shooterSystem
-        // .activateFeedWithSpeed(DriveController.getLeftTriggerAxis())));
         .onTrue(Commands.runOnce(() -> shooterSystem.toggleFeed()))
         .onFalse(Commands.runOnce(() -> shooterSystem.toggleFeed()));
 
-    // Update Field Position
+    // SG: Update Field Position
     UtilsController.povUp().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-    // resetPoseOnButton(UtilsController.povDown(), Outpost);
-    // resetPoseOnButton(UtilsController.povRight(), RightTrench);
-    // resetPoseOnButton(UtilsController.povLeft(), LeftTrench);
+    resetPoseOnButton(UtilsController.povDown(), Outpost);
+    resetPoseOnButton(UtilsController.povRight(), RightTrench);
+    resetPoseOnButton(UtilsController.povLeft(), LeftTrench);
 
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
   public Command getAutonomousCommand() {
-    // chooses the auto from GUI
+    // SG: chooses the auto from GUI
     return autoChooser.getSelected();
   }
 }
