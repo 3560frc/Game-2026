@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.HootAutoReplay;
+import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -16,6 +17,7 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
+    // SG: for the switchable port. Id may need to be configured in Rev Hardware Client
     private final PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
 
     /* log and replay timestamp and joystick data */
@@ -30,6 +32,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         pdp.setSwitchableChannel(true);
+        SignalLogger.start();
     }
 
     @Override

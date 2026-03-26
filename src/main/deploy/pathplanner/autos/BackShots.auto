@@ -5,9 +5,27 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Back"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PreShoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.75
           }
         },
         {
@@ -26,6 +44,12 @@
           "type": "named",
           "data": {
             "name": "StopShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeOff"
           }
         }
       ]

@@ -11,7 +11,8 @@ public class IntakeSystem extends SubsystemBase {
   PIDMotor leftHingeMotor;
   PIDMotor rightHingeMotor;
   PIDMotor intakeMotor;
-  boolean intakeUp;
+  // SG: nit -> use enum?
+  int intakeState = 0; // -1 = down, 0 = stop, 1 = up
   boolean intakeRollersEnabled;
 
   public IntakeSystem() {
@@ -25,7 +26,7 @@ public class IntakeSystem extends SubsystemBase {
     mmconfigs.MotionMagicCruiseVelocity = Constants.IntakeRoller.MAX_VELOCITY_RPS;
 
     intakeMotor = PIDMotor.init(Constants.IntakeRoller.MOTOR_ID, configs, mmconfigs, 1.0,
-        Constants.IntakeRoller.DIRECTION);
+        Constants.IntakeRoller.DIRECTION, 100);
 
     SlotConfigs left_configs = new SlotConfigs();
     left_configs.kP = Constants.IntakeHinge.kP;
@@ -39,7 +40,7 @@ public class IntakeSystem extends SubsystemBase {
     mmleft_configs.MotionMagicCruiseVelocity = Constants.IntakeHinge.MAX_VELOCITY_RPS;
 
     leftHingeMotor = PIDMotor.init(Constants.IntakeHinge.MOTOR_ID_LEFT, left_configs, mmleft_configs, 1.0,
-        Constants.IntakeHinge.DIRECTION);
+        Constants.IntakeHinge.LEFT_DIRECTION);
 
     SlotConfigs right_configs = new SlotConfigs();
     right_configs.kP = Constants.IntakeHinge.kP;
@@ -53,7 +54,7 @@ public class IntakeSystem extends SubsystemBase {
     mmright_configs.MotionMagicCruiseVelocity = Constants.IntakeHinge.MAX_VELOCITY_RPS;
 
     rightHingeMotor = PIDMotor.init(Constants.IntakeHinge.MOTOR_ID_RIGHT, right_configs, mmright_configs, 1.0,
-        Constants.IntakeHinge.DIRECTION);
+        Constants.IntakeHinge.RIGHT_DIRECTION);
   }
 
   @Override
@@ -73,15 +74,33 @@ public class IntakeSystem extends SubsystemBase {
     }
   }
 
-  public void toggleIntakeExtended() {
-    intakeUp = !intakeUp;
-    System.out.println(intakeUp);
-    if (intakeUp) {
-      leftHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
-      rightHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
-    } else {
-      rightHingeMotor.stop();
-      leftHingeMotor.stop();
-    }
+  public void setIntakeHingeDown() {
+    intakeState = -1;
+    leftHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+    rightHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
   }
+
+  public void setIntakeHingeUp() {
+    intakeState = 1;
+    leftHingeMotor.set(-Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+    rightHingeMotor.set(-Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+  }
+
+  public void stopIntakeHinge() {
+    intakeState = 0;
+    leftHingeMotor.stop();
+    rightHingeMotor.stop();
+  }
+
+  // public void toggleIntakeExtended() {
+  // intakeUp = !intakeUp;
+  // System.out.println(intakeUp);
+  // if (intakeUp) {
+  // leftHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+  // rightHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
+  // } else {
+  // rightHingeMotor.stop();
+  // leftHingeMotor.stop();
+  // }
+  // }
 }

@@ -26,7 +26,7 @@ public class ShooterSystem extends SubsystemBase {
     mmrollerconfigs.MotionMagicCruiseVelocity = Constants.ShooterRoller.MAX_VELOCITY_RPS;
 
     shooterRoller = PIDMotor.init(Constants.ShooterRoller.MOTOR_ID, rollerconfigs, mmrollerconfigs, 1.0,
-        Constants.ShooterRoller.DIRECTION);
+        Constants.ShooterRoller.DIRECTION, 100);
 
     SlotConfigs feedconfigs = new SlotConfigs();
     feedconfigs.kP = Constants.ShooterFeed.kP;
@@ -37,8 +37,8 @@ public class ShooterSystem extends SubsystemBase {
     mmfeedconfigs.MotionMagicAcceleration = Constants.ShooterFeed.MAX_ACCELERATION_RPSPS;
     mmfeedconfigs.MotionMagicCruiseVelocity = Constants.ShooterFeed.MAX_VELOCITY_RPS;
 
-    shooterRoller = PIDMotor.init(Constants.ShooterFeed.MOTOR_ID, feedconfigs, mmfeedconfigs, 1.0,
-        Constants.ShooterFeed.DIRECTION);
+    shooterFeed = PIDMotor.init(Constants.ShooterFeed.MOTOR_ID, feedconfigs, mmfeedconfigs, 1.0,
+        Constants.ShooterFeed.DIRECTION, 100);
   }
 
   @Override
@@ -81,5 +81,15 @@ public class ShooterSystem extends SubsystemBase {
     } else {
       shooterRoller.setVelocity(0);
     }
+  }
+
+  public void activateShooterWithSpeed(double percent) {
+    this.shooting = percent > 0;
+    shooterRoller.setVelocity((reverseDirection ? -1 : 1) * this.targetVelocity * percent);
+  }
+
+  public void activateFeedWithSpeed(double percent) {
+    this.feeding = percent > 0;
+    shooterFeed.setVelocity((reverseDirection ? -1 : 1) * this.targetVelocity * percent);
   }
 }
