@@ -32,6 +32,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.ShooterSystem;
+import frc.robot.subsystems.StorageSystem;
 
 public class RobotContainer {
   private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -58,9 +59,10 @@ public class RobotContainer {
   // SubSystems
   private final IntakeSystem intakeSystem = new IntakeSystem();
   private final ShooterSystem shooterSystem = new ShooterSystem();
-  // private final StorageSystem storageSystem = new StorageSystem();
+  private final StorageSystem storageSystem = new StorageSystem();
 
-  // SG: see https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/RobotContainer.java
+  // SG: see
+  // https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/RobotContainer.java
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -104,7 +106,7 @@ public class RobotContainer {
   private void resetPoseOnButton(Trigger trigger, Pose2d pose) {
     trigger.onTrue(Commands.runOnce(() -> drivetrain.resetPose(pose)));
   }
-  
+
   Pose2d HubCenter = new Pose2d(4.6304, 4.035, Rotation2d.fromDegrees(0));
   Pose2d Outpost = new Pose2d(0.4093, 0.3605, Rotation2d.fromDegrees(0));
   // Not sure
@@ -164,10 +166,10 @@ public class RobotContainer {
 
   private void configureBindings() {
     // SG: SysID bindings -> use to find PIDs for swerve drive
-    UtilsController.x().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    UtilsController.y().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    UtilsController.a().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    UtilsController.b().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    // UtilsController.x().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+    // UtilsController.y().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    // UtilsController.a().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+    // UtilsController.b().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     UtilsController.povRight().onTrue(Commands.runOnce(SignalLogger::start));
     UtilsController.povLeft().onTrue(Commands.runOnce(SignalLogger::stop));
@@ -248,6 +250,12 @@ public class RobotContainer {
         // .activateFeedWithSpeed(DriveController.getLeftTriggerAxis())));
         .onTrue(Commands.runOnce(() -> shooterSystem.toggleFeed()))
         .onFalse(Commands.runOnce(() -> shooterSystem.toggleFeed()));
+
+    UtilsController.b()
+        // .whileTrue(Commands.run(() -> shooterSystem
+        // .activateFeedWithSpeed(DriveController.getLeftTriggerAxis())));
+        .onTrue(Commands.runOnce(() -> storageSystem.toggleStorage()))
+        .onFalse(Commands.runOnce(() -> storageSystem.toggleStorage()));
 
     // Update Field Position
     UtilsController.povUp().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));

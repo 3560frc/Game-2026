@@ -39,6 +39,7 @@ public class StorageSystem {
 
   public void toggleStorage() {
     this.storageOn = !this.storageOn;
+    System.out.println(this.storageOn);
 
     if (this.storageOn) {
       leftMotor.setVelocity(Constants.StorageRollers.VELOCITY_RPS);

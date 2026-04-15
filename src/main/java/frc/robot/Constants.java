@@ -59,7 +59,7 @@ public class Constants {
 
     public class ShooterRoller {
         public static final int MOTOR_ID = 9;
-        public static final double kP = 0.035;
+        public static final double kP = 0.055;
         public static final double kI = 0;
         public static final double kD = 0;
         // public static final double VELOCITY_RPS = 10;
@@ -74,13 +74,13 @@ public class Constants {
 
     public class StorageRollers {
         // Needs reconfiguration
-        public static final int MOTOR_ID_LEFT = 15;
+        public static final int MOTOR_ID_LEFT = 5;
         public static final int MOTOR_ID_RIGHT = 15;
         public static final double kP = 0.032;
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double VELOCITY_RPS = 5;
-        public static final double MAX_VELOCITY_RPS = 5;
+        public static final double VELOCITY_RPS = 15;
+        public static final double MAX_VELOCITY_RPS = 15;
         public static final double MAX_ACCELERATION_RPSPS = 15;
         public static final InvertedValue DIRECTION = InvertedValue.CounterClockwise_Positive;
     }
