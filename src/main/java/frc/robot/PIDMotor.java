@@ -12,9 +12,11 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.MotionMagicVelocityDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class PIDMotor {
   private TalonFX motor;
@@ -23,6 +25,10 @@ public class PIDMotor {
 
   private PIDMotor() {
     motor = null;
+  }
+
+  public void enableNeutralMode() {
+    motor.setControl(new NeutralOut());
   }
 
   public static PIDMotor init(int motorID, SlotConfigs slotConfigs, MotionMagicConfigs mmconfigs, double gearRatio,
@@ -34,17 +40,20 @@ public class PIDMotor {
       InvertedValue direction, double max_amps) {
     PIDMotor self = new PIDMotor();
 
-    TalonFXConfiguration current_config = new TalonFXConfiguration().withCurrentLimits(
-        new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Amps.of(80))
-            .withStatorCurrentLimitEnable(true));
+    TalonFXConfiguration current_config = new TalonFXConfiguration()
+        .withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Amps.of(max_amps))
+                .withStatorCurrentLimitEnable(true));
 
     self.motor = new TalonFX(motorID);
     FeedbackConfigs configs = new FeedbackConfigs();
     configs.SensorToMechanismRatio = gearRatio;
     self.motor.getConfigurator().apply(configs);
     self.motor.getConfigurator().apply(current_config);
-    self.motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(direction));
+    self.motor.getConfigurator().apply(new MotorOutputConfigs()
+        .withInverted(direction)
+        .withNeutralMode(NeutralModeValue.Coast));
 
     Slot0Configs slot0Configs = Slot0Configs.from(slotConfigs);
     self.motor.getConfigurator().apply(slot0Configs);

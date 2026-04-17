@@ -36,10 +36,16 @@ public class Constants {
     }
 
     public class IntakeRoller {
-        public static final int MOTOR_ID = 38;
-        public static final double kP = 0.01;
-        public static final double kI = 0;
-        public static final double kD = 0;
+        public static final int LEFT_MOTOR_ID = 6;
+        public static final double LEFT_kP = 0.029;
+        public static final double LEFT_kI = 0;
+        public static final double LEFT_kD = 0;
+
+        public static final int RIGHT_MOTOR_ID = 38;
+        public static final double RIGHT_kP = 0.029;
+        public static final double RIGHT_kI = 0;
+        public static final double RIGHT_kD = 0;
+
         public static final double VELOCITY_RPS = 90; // estimate
         public static final double MAX_VELOCITY_RPS = 120;
         public static final double MAX_ACCELERATION_RPSPS = 610;
@@ -82,6 +88,7 @@ public class Constants {
         public static final double VELOCITY_RPS = 15;
         public static final double MAX_VELOCITY_RPS = 15;
         public static final double MAX_ACCELERATION_RPSPS = 15;
-        public static final InvertedValue DIRECTION = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue LEFT_DIRECTION = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue RIGHT_DIRECTION = InvertedValue.Clockwise_Positive;
     }
 }

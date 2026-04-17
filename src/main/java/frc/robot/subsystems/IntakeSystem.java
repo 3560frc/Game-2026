@@ -10,23 +10,32 @@ import frc.robot.PIDMotor;
 public class IntakeSystem extends SubsystemBase {
   PIDMotor leftHingeMotor;
   PIDMotor rightHingeMotor;
-  PIDMotor intakeMotor;
+  PIDMotor leftRollerMotor;
+  PIDMotor rightRollerMotor;
   // SG: nit -> use enum?
   int intakeState = 0; // -1 = down, 0 = stop, 1 = up
   boolean intakeRollersEnabled;
 
   public IntakeSystem() {
-    SlotConfigs configs = new SlotConfigs();
-    configs.kP = Constants.IntakeRoller.kP;
-    configs.kI = Constants.IntakeRoller.kI;
-    configs.kD = Constants.IntakeRoller.kD;
+    SlotConfigs left_configs_roller = new SlotConfigs();
+    left_configs_roller.kP = Constants.IntakeRoller.LEFT_kP;
+    left_configs_roller.kI = Constants.IntakeRoller.LEFT_kI;
+    left_configs_roller.kD = Constants.IntakeRoller.LEFT_kD;
+
+    SlotConfigs right_configs_roller = new SlotConfigs();
+    right_configs_roller.kP = Constants.IntakeRoller.RIGHT_kP;
+    right_configs_roller.kI = Constants.IntakeRoller.RIGHT_kI;
+    right_configs_roller.kD = Constants.IntakeRoller.RIGHT_kD;
 
     MotionMagicConfigs mmconfigs = new MotionMagicConfigs();
     mmconfigs.MotionMagicAcceleration = Constants.IntakeRoller.MAX_ACCELERATION_RPSPS;
     mmconfigs.MotionMagicCruiseVelocity = Constants.IntakeRoller.MAX_VELOCITY_RPS;
 
-    intakeMotor = PIDMotor.init(Constants.IntakeRoller.MOTOR_ID, configs, mmconfigs, 1.0,
-        Constants.IntakeRoller.DIRECTION, 100);
+    leftRollerMotor = PIDMotor.init(Constants.IntakeRoller.LEFT_MOTOR_ID, left_configs_roller, mmconfigs, 1.0,
+        Constants.IntakeRoller.DIRECTION, 60);
+
+    rightRollerMotor = PIDMotor.init(Constants.IntakeRoller.RIGHT_MOTOR_ID, right_configs_roller, mmconfigs, 1.0,
+        Constants.IntakeRoller.DIRECTION, 60);
 
     SlotConfigs left_configs = new SlotConfigs();
     left_configs.kP = Constants.IntakeHinge.kP;
@@ -59,7 +68,8 @@ public class IntakeSystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    intakeMotor.update();
+    leftRollerMotor.update();
+    rightRollerMotor.update();
     leftHingeMotor.update();
     rightHingeMotor.update();
   }
@@ -68,9 +78,11 @@ public class IntakeSystem extends SubsystemBase {
     intakeRollersEnabled = !intakeRollersEnabled;
 
     if (intakeRollersEnabled) {
-      intakeMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
+      leftRollerMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
+      rightRollerMotor.setVelocity(Constants.IntakeRoller.VELOCITY_RPS);
     } else {
-      intakeMotor.setVelocity(0);
+      leftRollerMotor.setVelocity(0);
+      rightRollerMotor.setVelocity(0);
     }
   }
 
@@ -91,16 +103,4 @@ public class IntakeSystem extends SubsystemBase {
     leftHingeMotor.stop();
     rightHingeMotor.stop();
   }
-
-  // public void toggleIntakeExtended() {
-  // intakeUp = !intakeUp;
-  // System.out.println(intakeUp);
-  // if (intakeUp) {
-  // leftHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
-  // rightHingeMotor.set(Constants.IntakeHinge.ROTATIONS_PER_EXTENSION);
-  // } else {
-  // rightHingeMotor.stop();
-  // leftHingeMotor.stop();
-  // }
-  // }
 }

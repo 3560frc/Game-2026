@@ -87,12 +87,14 @@ public class RobotContainer {
         "Shoot",
         Commands.runOnce(() -> {
           shooterSystem.toggleFeed();
+          storageSystem.toggleStorage();
         }));
     NamedCommands.registerCommand(
         "StopShoot",
         Commands.runOnce(() -> {
           shooterSystem.toggleShooter();
           shooterSystem.toggleFeed();
+          storageSystem.toggleStorage();
         }));
     NamedCommands.registerCommand(
         "ToggleIntake",
@@ -248,14 +250,19 @@ public class RobotContainer {
     UtilsController.leftTrigger()
         // .whileTrue(Commands.run(() -> shooterSystem
         // .activateFeedWithSpeed(DriveController.getLeftTriggerAxis())));
-        .onTrue(Commands.runOnce(() -> shooterSystem.toggleFeed()))
-        .onFalse(Commands.runOnce(() -> shooterSystem.toggleFeed()));
+        .onTrue(Commands.runOnce(() -> {
+          shooterSystem.toggleFeed();
+          storageSystem.toggleStorage();
+        }))
+        .onFalse(Commands.runOnce(() -> {
+          shooterSystem.toggleFeed();
+          storageSystem.toggleStorage();
+        }));
 
     UtilsController.b()
         // .whileTrue(Commands.run(() -> shooterSystem
         // .activateFeedWithSpeed(DriveController.getLeftTriggerAxis())));
-        .onTrue(Commands.runOnce(() -> storageSystem.toggleStorage()))
-        .onFalse(Commands.runOnce(() -> storageSystem.toggleStorage()));
+        .onTrue(Commands.runOnce(() -> storageSystem.toggleStorage()));
 
     // Update Field Position
     UtilsController.povUp().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
