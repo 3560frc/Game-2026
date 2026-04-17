@@ -40,16 +40,18 @@ public class Constants {
         public static final double LEFT_kP = 0.029;
         public static final double LEFT_kI = 0;
         public static final double LEFT_kD = 0;
+        public static final InvertedValue LEFT_DIRECTION = InvertedValue.CounterClockwise_Positive;
 
         public static final int RIGHT_MOTOR_ID = 38;
         public static final double RIGHT_kP = 0.029;
         public static final double RIGHT_kI = 0;
         public static final double RIGHT_kD = 0;
+        public static final InvertedValue RIGHT_DIRECTION = InvertedValue.Clockwise_Positive;
 
-        public static final double VELOCITY_RPS = 90; // estimate
+        public static final double VELOCITY_RPS = 100; // estimate
         public static final double MAX_VELOCITY_RPS = 120;
         public static final double MAX_ACCELERATION_RPSPS = 610;
-        public static final InvertedValue DIRECTION = InvertedValue.CounterClockwise_Positive;
+
     }
 
     public class ShooterFeed {

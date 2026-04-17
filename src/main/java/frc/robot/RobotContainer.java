@@ -16,6 +16,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.IntakeSystem;
+import frc.robot.subsystems.IntakeSystemV2;
 import frc.robot.subsystems.ShooterSystem;
 import frc.robot.subsystems.StorageSystem;
 
@@ -57,7 +59,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   // SubSystems
-  private final IntakeSystem intakeSystem = new IntakeSystem();
+  private final IntakeSystemV2 intakeSystem = new IntakeSystemV2();
   private final ShooterSystem shooterSystem = new ShooterSystem();
   private final StorageSystem storageSystem = new StorageSystem();
 
@@ -178,8 +180,8 @@ public class RobotContainer {
 
     configureDriveBindings();
 
-    SlewRateLimiter y = new SlewRateLimiter(0.85);
-    SlewRateLimiter x = new SlewRateLimiter(0.85);
+    SlewRateLimiter y = new SlewRateLimiter(1.5);
+    SlewRateLimiter x = new SlewRateLimiter(1.5);
     // SlewRateLimiter r = new SlewRateLimiter(0.85);
 
     // SG: if backwards is forwards and forwards is backwards flip the controls

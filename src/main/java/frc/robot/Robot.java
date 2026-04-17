@@ -7,6 +7,8 @@ package frc.robot;
 import com.ctre.phoenix6.HootAutoReplay;
 import com.ctre.phoenix6.SignalLogger;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,6 +35,10 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         pdp.setSwitchableChannel(true);
         SignalLogger.start();
+
+        //UsbCamera camera = CameraServer.startAutomaticCapture();
+        //camera.setFPS(30);
+        //camera.setResolution(1080, 720); 
     }
 
     @Override
