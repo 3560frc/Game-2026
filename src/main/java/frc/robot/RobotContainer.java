@@ -180,8 +180,8 @@ public class RobotContainer {
 
     configureDriveBindings();
 
-    SlewRateLimiter y = new SlewRateLimiter(1.5);
-    SlewRateLimiter x = new SlewRateLimiter(1.5);
+    SlewRateLimiter y = new SlewRateLimiter(3.1);
+    SlewRateLimiter x = new SlewRateLimiter(3.1);
     // SlewRateLimiter r = new SlewRateLimiter(0.85);
 
     // SG: if backwards is forwards and forwards is backwards flip the controls
