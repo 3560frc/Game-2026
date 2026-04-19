@@ -18,9 +18,13 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cameraserver.CameraServerShared;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -59,7 +63,6 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   // SubSystems
-  private final IntakeSystemV2 intakeSystem = new IntakeSystemV2();
   private final ShooterSystem shooterSystem = new ShooterSystem();
   private final StorageSystem storageSystem = new StorageSystem();
 
@@ -97,12 +100,6 @@ public class RobotContainer {
           shooterSystem.toggleShooter();
           shooterSystem.toggleFeed();
           storageSystem.toggleStorage();
-        }));
-    NamedCommands.registerCommand(
-        "ToggleIntake",
-        Commands.runOnce(() -> {
-          // storageSystem.toggleStorage();
-          intakeSystem.toggleIntakeRollers();
         }));
   }
 
@@ -150,18 +147,10 @@ public class RobotContainer {
     RobotModeTriggers.disabled().whileTrue(
         drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-    DriveController.rightTrigger()
-        .onTrue(Commands.runOnce(() -> intakeSystem.toggleIntakeRollers()))
-        .onFalse(Commands.runOnce(() -> intakeSystem.toggleIntakeRollers()));
-
     // SG: for storage rollers we don't use anymore
     // DriveController.leftTrigger()
     // .onTrue(Commands.runOnce(() -> storageSystem.toggleStorage()))
     // .onFalse(Commands.runOnce(() -> storageSystem.toggleStorage()));
-
-    DriveController.a().onTrue(Commands.runOnce(() -> intakeSystem.setIntakeHingeDown()));
-    DriveController.y().onTrue(Commands.runOnce(() -> intakeSystem.setIntakeHingeUp()));
-    DriveController.b().onTrue(Commands.runOnce(() -> intakeSystem.stopIntakeHinge()));
 
     DriveController.povDown().onTrue(Commands.runOnce(() -> {
       shooterSystem.reverseDirection = !shooterSystem.reverseDirection;
@@ -180,8 +169,8 @@ public class RobotContainer {
 
     configureDriveBindings();
 
-    SlewRateLimiter y = new SlewRateLimiter(3.1);
-    SlewRateLimiter x = new SlewRateLimiter(3.1);
+    SlewRateLimiter y = new SlewRateLimiter(2.9);
+    SlewRateLimiter x = new SlewRateLimiter(2.9);
     // SlewRateLimiter r = new SlewRateLimiter(0.85);
 
     // SG: if backwards is forwards and forwards is backwards flip the controls
